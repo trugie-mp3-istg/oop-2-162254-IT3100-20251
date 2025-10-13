@@ -3,7 +3,7 @@ package com.mycompany.poker;
 public class Card {
     
     //Trung cx kbiet hàm này để làm j nma xóa thì lỗi ae
-    //Hnhu chỗ này dùng test code
+    //Hnhu chỗ này dùng test code được
     public static void main(String[] args){
     }
     
