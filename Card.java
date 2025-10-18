@@ -58,10 +58,11 @@ public class Card {
     e.g. Card card = new Card("3h") //Three of Hearts
     */
     public Card(String s) {
-        s = s.trim();
         if (s == null) {
             throw new IllegalArgumentException("Null string!");
         }
+
+        s = s.trim();
         if (s.length() != 2) {
             throw new IllegalArgumentException("Invalid string length!");
         }
