@@ -1,0 +1,15 @@
+package actions;
+
+/**
+ * Hành động đặt tiền mù lớn (Big Blind).
+ */
+public class BigBlindAction extends Action {
+    
+    /**
+     * Hàm khởi tạo.
+     */
+    /* package */ BigBlindAction() {
+        super("Big blind", "posts the big blind");
+    }
+    
+}
