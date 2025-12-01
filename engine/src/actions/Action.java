@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 /**
  * Lớp cha Action.
  */
-public abstract class Action implements Serializable { 
-    
+public abstract class Action implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     // Các biến static này gọi đến các constructor của lớp con.
@@ -20,7 +20,7 @@ public abstract class Action implements Serializable {
     public static final Action FOLD = new FoldAction();
     public static final Action RAISE = new RaiseAction(BigDecimal.ZERO);
     public static final Action SMALL_BLIND = new SmallBlindAction();
-    
+
     private final String name;
     private final String verb;
     private final BigDecimal amount;
@@ -28,17 +28,17 @@ public abstract class Action implements Serializable {
     public Action(String name, String verb) {
         this(name, verb, BigDecimal.ZERO);
     }
-    
+
     public Action(String name, String verb, BigDecimal amount) {
         this.name = name;
         this.verb = verb;
         this.amount = amount;
     }
-    
+
     public final String getName() { return name; }
     public final String getVerb() { return verb; }
     public final BigDecimal getAmount() { return amount; }
-    
+
     @Override
     public String toString() { return name; }
 }
