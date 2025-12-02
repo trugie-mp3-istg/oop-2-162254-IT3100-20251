@@ -151,12 +151,16 @@ public class Table {
                 if (action == Action.CHECK) { }
                 else if (action == Action.CALL) {
                     BigDecimal diff = bet.subtract(actor.getBet()).min(actor.getCash());
+                    /* diff = min{(bet - getbet), getcash
+                    để xử lý trường hợp muốn Call mà số tiền ko đủ thì sẽ thành lệnh All in
+                    trong trường hợp đủ thì diff = số tiền Call ở RoundBet này - số tiền đã Call ở RoundBet trước  
+                    */
                     actor.payCash(diff); actor.setBet(actor.getBet().add(diff)); contributePot(diff);
                 } else if (action instanceof BetAction || action instanceof RaiseAction) {
                     BigDecimal amount = (tableType == TableType.FIXED_LIMIT) ? minBet : action.getAmount();
                     if (action instanceof RaiseAction) {
                         bet = bet.add(amount); raises++;
-                        playersToAct = activePlayers.size() - 1; // Mọi người phải vòng lại
+                        playersToAct = activePlayers.size() - 1; // Mọi người phải vòng lại để xem xét Call Fold hay Check ở mức Raise này
                     } else {
                         bet = amount; playersToAct = activePlayers.size();
                     }
@@ -165,7 +169,7 @@ public class Table {
                     actor.payCash(diff); actor.setBet(bet); contributePot(diff);
                 } else if (action == Action.FOLD) {
                     actor.setCards(null); activePlayers.remove(actor); actorPosition--;
-                    if (activePlayers.size() == 1) { // Thắng luôn
+                    if (activePlayers.size() == 1) { // Thắng luôn bằng cách các người chơi còn lại đã Fold
                         Player winner = activePlayers.get(0);
                         winner.win(getTotalPot());
                         notifyMessage(winner + " wins.");
