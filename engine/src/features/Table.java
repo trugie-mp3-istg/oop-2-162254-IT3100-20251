@@ -192,23 +192,50 @@ public class Table {
         notifyPlayersUpdated(true);
     }
 
-    private void contributePot(BigDecimal amount) {
-        // Logic chia Side Pot
-        for (Pot pot : pots) {
-            if (!pot.hasContributer(actor)) {
-                if (amount.compareTo(pot.getBet()) >= 0) {
-                    pot.addContributer(actor); amount = amount.subtract(pot.getBet());
-                } else {
-                    pots.add(pot.split(actor, amount)); amount = BigDecimal.ZERO;
-                }
+    public void contributePot(BigDecimal amount) {
+    ListIterator<Pot> iterator = pots.listIterator();
+    
+    while (iterator.hasNext()) {
+        Pot pot = iterator.next();
+        
+        // Nếu người chơi này chưa có trong Pot này
+        if (!pot.hasContributer(actor)) {
+            
+            // Trường hợp 1: Đủ tiền để theo Pot này
+            if (amount.compareTo(pot.getBet()) >= 0) {
+                pot.addContributer(actor);
+                amount = amount.subtract(pot.getBet());
+            } 
+            // Trường hợp 2: Không đủ tiền (All-in thiếu) -> Cần TÁCH POT
+            else {
+                // Logic Split: 
+                // Pot hiện tại sẽ bị thu nhỏ lại bằng đúng số tiền 'amount' (Main part)
+                // Một Pot mới (excessPot) được tạo ra chứa phần dư (Side part)
+                Pot excessPot = pot.split(actor, amount);
+                
+                // Người chơi hiện tại chỉ tham gia vào Pot nhỏ (đã được add trong hàm split hoặc logic class Pot)
+                // Lưu ý: Hàm split của bạn cần đảm bảo 'actor' được thêm vào phần Pot nhỏ.
+                
+                // Chèn cái Pot dư (Side part) vào ngay sau Pot hiện tại
+                iterator.add(excessPot); 
+                
+                amount = BigDecimal.ZERO; // Hết tiền
             }
-            if (amount.equals(BigDecimal.ZERO)) break;
         }
-        if (amount.compareTo(BigDecimal.ZERO) > 0) {
-            Pot p = new Pot(amount); p.addContributer(actor); pots.add(p);
-        }
+        
+        // Nếu hết tiền thì dừng việc đóng góp
+        if (amount.compareTo(BigDecimal.ZERO) == 0) break;
     }
 
+    // Nếu duyệt hết các Pot cũ mà vẫn còn thừa tiền (Raise hoặc Bet mới)
+    if (amount.compareTo(BigDecimal.ZERO) > 0) {
+        Pot newPot = new Pot(amount);
+        newPot.addContributer(actor);
+        pots.add(newPot);
+    }
+}
+
+   
     private Set<Action> getAllowedActions(Player p) {
         Set<Action> actions = new HashSet<>();
         if (p.isAllIn()) { actions.add(Action.CHECK); return actions; }
