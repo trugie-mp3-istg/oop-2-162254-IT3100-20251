@@ -1,5 +1,6 @@
 package features;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -8,6 +9,7 @@ import java.io.Serializable;
  */
 public class Card implements Comparable<Card>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L; // Định danh phiên bản khi gửi qua mạng
 
     public static final int NO_OF_RANKS = 13;

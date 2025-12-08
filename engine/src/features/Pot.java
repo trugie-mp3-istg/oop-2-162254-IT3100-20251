@@ -38,15 +38,23 @@ public class Pot implements Serializable {
     /**
      * Tách Pot hiện tại thành 2 (Main Pot và Side Pot) khi có người chơi All-in ít tiền hơn mức cược.
      */
-    public Pot split(Player player, BigDecimal partialBet) {
-        Pot pot = new Pot(bet.subtract(partialBet));
-        for (Player contributer : contributors) {
-            pot.addContributer(contributer);
-        }
-        bet = partialBet;
-        contributors.add(player);
-        return pot;
+    public Pot split(Player splitter, BigDecimal partialBet) {
+    // 1. Tạo Pot mới chứa phần dư (Phần cao hơn)
+    // Những người đã đóng góp vào Pot cũ thì mặc nhiên cũng đóng góp vào phần dư này
+    Pot excessPot = new Pot(this.bet.subtract(partialBet));
+    for (Player p : this.contributors) {
+        excessPot.addContributer(p);
     }
+    
+    // 2. Thu nhỏ Pot hiện tại (Phần thấp hơn - Main Pot)
+    this.bet = partialBet;
+    
+    // 3. Thêm người chơi All-in vào Pot thấp này
+    this.addContributer(splitter); 
+    
+    // Trả về Pot dư để thêm vào list
+    return excessPot;
+   }
 
     public void clear() {
         bet = BigDecimal.ZERO;
