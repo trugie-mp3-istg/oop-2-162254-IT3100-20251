@@ -1,14 +1,17 @@
 package features;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Quản lý bộ bài trên tay hoặc bộ bài chung (Board).
  * Tự động sắp xếp bài từ lớn đến nhỏ khi thêm vào.
  */
-public class Hand implements Serializable {
+public final class Hand implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private static final int MAX_NO_OF_CARDS = 7;
     private Card[] cards = new Card[MAX_NO_OF_CARDS];
@@ -25,7 +28,7 @@ public class Hand implements Serializable {
 
     public Hand(String s) {
         if (s == null || s.length() == 0) throw new IllegalArgumentException("Null string");
-        String[] parts = s.split("\\s");
+        String[] parts = s.split("\s");
         for (String part : parts) addCard(new Card(part));
     }
 
