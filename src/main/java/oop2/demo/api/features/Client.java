@@ -3,7 +3,7 @@ package oop2.demo.api.features;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
-import actions.Action;
+import oop2.demo.api.actions.Action;
 
 public interface Client {
     void messageReceived(String message);

@@ -1,6 +1,6 @@
 package oop2.demo.api.features;
 
-import actions.Action;
+import oop2.demo.api.actions.Action;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -80,13 +80,13 @@ public class Player implements Serializable {
     }
 
     public void postSmallBlind(BigDecimal amount) {
-        this.action = new actions.SmallBlindAction();
+        this.action = new oop2.demo.api.actions.SmallBlindAction();
         payCash(amount);
         this.bet = amount;
     }
 
     public void postBigBlind(BigDecimal amount) {
-        this.action = new actions.BigBlindAction();
+        this.action = new oop2.demo.api.actions.BigBlindAction();
         payCash(amount);
         this.bet = amount;
     }
