@@ -8,7 +8,8 @@ public class BigBlindAction extends Action {
     /**
      * Hàm khởi tạo.
      */
-    /* package */ BigBlindAction() {
+    /* package */
+    public BigBlindAction() {
         super("Big blind", "posts the big blind");
     }
     

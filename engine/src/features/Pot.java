@@ -2,67 +2,52 @@ package features;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Hũ tiền (Pot).
- * Hỗ trợ logic Side-Pot (chia hũ phụ) khi có người All-in thiếu tiền.
- */
 public class Pot implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    /** Mức cược trần của Pot này. */
     private BigDecimal bet;
-
-    /** Những người chơi tham gia vào Pot này. */
-    public final Set<Player> contributors;
+    private Set<Player> contributors; // Khai báo biến
 
     public Pot(BigDecimal bet) {
         this.bet = bet;
-        contributors = new HashSet<>();
+        this.contributors = new HashSet<>(); // <--- QUAN TRỌNG: Phải có dòng này để tránh NullPointerException
     }
 
-    public BigDecimal getBet() { return bet; }
-    public Set<Player> getContributors() { return Collections.unmodifiableSet(contributors); }
+    // Sửa lỗi UnsupportedOperationException: Phải trả về giá trị thật
+    public BigDecimal getBet() {
+        return this.bet;
+    }
 
-    public void addContributer(Player player) { contributors.add(player); }
-    public boolean hasContributer(Player player) { return contributors.contains(player); }
+    public void addContributer(Player p) {
+        this.contributors.add(p);
+    }
+
+    public boolean hasContributer(Player p) {
+        return this.contributors.contains(p);
+    }
+
+    public Set<Player> getContributors() {
+        return this.contributors;
+    }
 
     public BigDecimal getValue() {
         return bet.multiply(new BigDecimal(contributors.size()));
     }
 
-    /**
-     * Tách Pot hiện tại thành 2 (Main Pot và Side Pot) khi có người chơi All-in ít tiền hơn mức cược.
-     */
     public Pot split(Player splitter, BigDecimal partialBet) {
-    // 1. Tạo Pot mới chứa phần dư (Phần cao hơn)
-    // Những người đã đóng góp vào Pot cũ thì mặc nhiên cũng đóng góp vào phần dư này
-    Pot excessPot = new Pot(this.bet.subtract(partialBet));
-    for (Player p : this.contributors) {
-        excessPot.addContributer(p);
-    }
-    
-    // 2. Thu nhỏ Pot hiện tại (Phần thấp hơn - Main Pot)
-    this.bet = partialBet;
-    
-    // 3. Thêm người chơi All-in vào Pot thấp này
-    this.addContributer(splitter); 
-    
-    // Trả về Pot dư để thêm vào list
-    return excessPot;
-   }
-
-    public void clear() {
-        bet = BigDecimal.ZERO;
-        contributors.clear();
+        Pot excessPot = new Pot(this.bet.subtract(partialBet));
+        // Copy người chơi cũ sang Pot mới
+        for (Player p : this.contributors) {
+            excessPot.addContributer(p);
+        }
+        this.bet = partialBet;
+        this.addContributer(splitter);
+        return excessPot;
     }
 
     @Override
     public String toString() {
-        return "Pot: " + getValue();
+        return "Pot Value: " + getValue();
     }
 }
