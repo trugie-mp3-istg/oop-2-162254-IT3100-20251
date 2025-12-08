@@ -51,9 +51,14 @@ public class Hand implements Serializable {
         }
     }
 
-    public void addCards(Card[] cards) {
-        if (cards == null) throw new IllegalArgumentException("Null array");
-        for (Card c : cards) addCard(c);
+    public void addCards(Card[] cards2) {
+        if (cards2 == null) throw new IllegalArgumentException("Null array");
+        for (Card c : cards2) addCard(c);
+    }
+
+    public void addCards(List<Card> cards2) {
+        if (cards2 == null) throw new IllegalArgumentException("Null list");
+        for (Card c : cards2) addCard(c);
     }
 
     public Card[] getCards() {
