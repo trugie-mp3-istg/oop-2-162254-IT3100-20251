@@ -1,4 +1,4 @@
-package features;
+package oop2.demo.api.features;
 
 /**
  * Máy chấm điểm bài. Logic để xác định Thùng, Sảnh, Cù lũ...

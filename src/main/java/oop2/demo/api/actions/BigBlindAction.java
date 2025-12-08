@@ -1,4 +1,4 @@
-package actions;
+package oop2.demo.api.actions;
 
 /**
  * Hành động đặt tiền mù lớn (Big Blind).

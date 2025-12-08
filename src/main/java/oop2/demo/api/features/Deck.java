@@ -1,4 +1,4 @@
-package features;
+package oop2.demo.api.features;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;

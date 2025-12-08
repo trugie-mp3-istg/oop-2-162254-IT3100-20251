@@ -1,4 +1,4 @@
-package actions;
+package oop2.demo.api.actions;
 
 /**
  * Hành động theo cược (Call) bằng với số tiền người trước đã tố.

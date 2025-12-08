@@ -1,4 +1,4 @@
-package actions;
+package oop2.demo.api.actions;
 
 /**
  * Hành động tố tất cả số tiền đang có (All-in).

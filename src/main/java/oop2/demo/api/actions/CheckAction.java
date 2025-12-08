@@ -1,4 +1,4 @@
-package actions;
+package oop2.demo.api.actions;
 
 /**
  * Hành động xem bài (Check) khi chưa có ai cược.

@@ -1,4 +1,4 @@
-package features;
+package oop2.demo.api.features;
 
 import java.math.BigDecimal;
 import java.util.List;
