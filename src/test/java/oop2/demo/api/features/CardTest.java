@@ -16,7 +16,7 @@ public class CardTest {
         assertEquals(Card.HEARTS, card.getSuit());
         assertEquals("Ac", card.toString());
 
-        card = new Card("   Kb "); // Automatic trimming.
+        card = new Card("   Kb "); // Tự động loại bỏ khoảng trắng.
         assertNotNull(card);
         assertEquals(Card.KING, card.getRank());
         assertEquals(Card.SPADES, card.getSuit());
@@ -58,6 +58,13 @@ public class CardTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> new Card("Ax"));                         // Suit không hợp lệ
+        
+        //Kiểm tra khởi tạo đúng
+        Card card = new Card("Kc");
+        assertNotNull(card);
+        assertEquals(Card.KING, card.getRank());
+        assertEquals(Card.HEARTS, card.getSuit());
+        assertEquals("Kc", card.toString());
     }
 
     /**
