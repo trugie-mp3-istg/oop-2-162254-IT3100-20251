@@ -1,6 +1,8 @@
 package oop2.demo.api.features;
 
 import oop2.demo.api.actions.Action;
+import oop2.demo.api.net.sever.PlayerHandler;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -110,6 +112,10 @@ public class Player implements Serializable {
 
     @Override
     public String toString() {
-        return name;
+        return null;
+    }
+
+    public void setClient(PlayerHandler playerHandler) {
+        client = playerHandler;
     }
 }
