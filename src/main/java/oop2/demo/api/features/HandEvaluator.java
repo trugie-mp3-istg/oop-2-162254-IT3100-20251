@@ -195,11 +195,43 @@ public class HandEvaluator {
     }
 
     private boolean isStraightFlush() {
-        if (straightRank != -1 && flushRank == straightRank) {
-            if (straightRank == Card.ACE) type = HandValueType.ROYAL_FLUSH;
-            else type = HandValueType.STRAIGHT_FLUSH;
-            rankings[0] = type.getValue();
-            return true;
+        if (flushSuit != -1) {
+            // Đánh dấu suitRankDist = 1 cho các lá bài cùng chất với flushSuit
+            int[] suitRankDist = new int[Card.NO_OF_RANKS];
+            for (Card card : cards) {
+                if (card.getSuit() == flushSuit) suitRankDist[card.getRank()] = 1;
+            }
+
+            // Tìm straight trong suitRankDist
+            boolean inStraight = false;
+            int rank = -1;
+            int count = 0;
+            int sfRank = -1;
+            for (int i = Card.NO_OF_RANKS - 1; i >= 0; i--) {
+                if (suitRankDist[i] == 0) { inStraight = false; count = 0; }
+                else {
+                    if (!inStraight) { inStraight = true; rank = i; }
+                    count++;
+                    if (count >= 5) { sfRank = rank; break; }
+                }
+            }
+            // Kiểm tra trường hợp wheel (A-2-3-4-5)
+            if (sfRank == -1 && count == 4 && rank == Card.FIVE && suitRankDist[Card.ACE] > 0) {
+                sfRank = rank; // Lấy 5 làm High Card của Sảnh thùng
+            }
+            // Kiểm tra thêm trường hợp wheel (A-2-3-4-5) 
+            if (sfRank == -1 && suitRankDist[Card.ACE] > 0 && suitRankDist[Card.FIVE] > 0 && suitRankDist[Card.FOUR] > 0 && suitRankDist[Card.THREE] > 0 && suitRankDist[Card.DEUCE] > 0) {
+                sfRank = Card.FIVE;
+            }
+
+            if (sfRank != -1) {
+                straightRank = sfRank; // Cập nhật lại straightRank cho Sảnh thùng
+                if (straightRank == Card.ACE) type = HandValueType.ROYAL_FLUSH;
+                else type = HandValueType.STRAIGHT_FLUSH;
+                rankings[0] = type.getValue();
+                rankings[1] = straightRank;
+                return true;
+            }
         }
         return false;
     }
