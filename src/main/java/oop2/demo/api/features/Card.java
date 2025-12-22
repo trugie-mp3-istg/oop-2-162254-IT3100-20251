@@ -23,7 +23,7 @@ public class Card implements Comparable<Card>, Serializable {
     public static final int SPADES = 3, HEARTS = 2, CLUBS = 1, DIAMONDS = 0;
 
     public static final String[] RANK_SYMBOLS = { "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A" };
-    public static final char[] SUIT_SYMBOLS = { 'r', 'c', 'b', 'n' };
+    public static final char[] SUIT_SYMBOLS = { 'r', 'n', 'c', 'b' };
 
     private final int rank;
     private final int suit;
