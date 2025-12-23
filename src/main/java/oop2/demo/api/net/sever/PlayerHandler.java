@@ -49,8 +49,8 @@ public class PlayerHandler extends Thread implements Client {
             // 3. Tạo Player Logic và báo cho Server biết
             // (Tuỳ vào thiết kế của bạn, có thể Server đã tạo Player rồi gán vào đây,
             // nhưng ở đây giả sử Handler tự tạo)
-            this.playerLogic = new Player(name, new BigDecimal(10000));
-            this.playerLogic.setClient(this);
+            // Gộp lại thành 1 dòng. Truyền 'this' (chính là PlayerHandler) vào làm Client
+            this.playerLogic = new Player(name, new BigDecimal(10000), this);
 
             // QUAN TRỌNG: Thêm player vào bàn cờ của Server
             server.getTable().addPlayer(this.playerLogic);

@@ -87,10 +87,20 @@ public class GameSceneController {
     }
 
     private void updatePlayer(Player player) {
-        var hand = player.getCards();
-        if (hand.size() >= 2) {
-            showCard(player1Card, hand.get(0));
-            showCard(player2Card, hand.get(1));
+        // 1. Lấy mảng bài ra
+        Card[] hand = player.getCards();
+
+        // 2. Kiểm tra null và độ dài mảng (dùng .length thay vì .size())
+        if (hand != null && hand.length >= 2) {
+
+            // 3. Truy cập phần tử mảng bằng ngoặc vuông [] thay vì .get()
+            showCard(player1Card, hand[0]);
+            showCard(player2Card, hand[1]);
+        } else {
+            // Nếu không có bài (Fold hoặc chưa chia) -> Úp bài
+            // (Bạn nên thêm dòng này để reset ảnh khi sang ván mới)
+            player1Card.setImage(cardBackImage);
+            player2Card.setImage(cardBackImage);
         }
     }
     private void updateBoard(Table table) {

@@ -706,5 +706,9 @@ public class Table {
             p.getClient().playerActed(playerInfo);
         }
     }
+    // Trong file oop2.demo.api.features.Table.java
 
+    public List<Card> getBoardCards() {
+        return this.board;
+    }
 }
