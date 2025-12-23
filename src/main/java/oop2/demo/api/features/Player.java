@@ -1,121 +1,220 @@
 package oop2.demo.api.features;
 
-import oop2.demo.api.actions.Action;
-import oop2.demo.api.net.sever.PlayerHandler;
-
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
+import oop2.demo.api.actions.Action;
 
-public class Player implements Serializable {
-    private static final long serialVersionUID = 1L;
+/**
+ * Lớp biểu diễn một người chơi trong Texas Hold'em.
+ *
+ * Hành vi của người chơi được ủy quyền cho {@link Client},
+ * có thể là người chơi thật hoặc bot AI.
+ */
+public class Player {
 
-    private String name;
+    /** Tên người chơi */
+    private final String name;
+
+    /** Client điều khiển hành vi của người chơi */
+    private final Client client;
+
+    /** Tay bài của người chơi */
+    private final Hand hand;
+
+    /** Số tiền hiện tại */
     private BigDecimal cash;
-    private BigDecimal bet; // Số tiền đã cược trong vòng hiện tại
-    private Action action;  // Hành động vừa thực hiện
-    private List<Card> cards = new ArrayList<>(); // Bài tẩy (Hole cards)
-    private boolean isAllIn = false;
 
-    // [QUAN TRỌNG] Kết nối Socket tới người chơi này.
-    // Dùng 'transient' để khi gửi object Player này qua mạng cho người khác,
-    // Java sẽ KHÔNG gửi kèm cái kết nối Socket (vì Socket ko gửi được).
-    private transient Client client;
+    /** Trạng thái đã được chia bài tẩy hay chưa */
+    private boolean hasCards;
 
-    // Constructor cho Server (Có Client)
+    /** Số tiền đang cược */
+    private BigDecimal bet;
+
+    /** Hành động gần nhất */
+    private Action action;
+
+    /**
+     * Khởi tạo người chơi
+     *
+     * @param name   tên người chơi
+     * @param cash   số tiền ban đầu
+     * @param client client điều khiển hành vi
+     */
     public Player(String name, BigDecimal cash, Client client) {
         this.name = name;
-        this.cash = (cash != null) ? cash : BigDecimal.ZERO;
-        this.client = client;
-        this.bet = BigDecimal.ZERO;
-    }
-
-    // Constructor cho việc Clone (Không cần Client)
-    public Player(String name, BigDecimal cash) {
-        this.name = name;
         this.cash = cash;
-        this.bet = BigDecimal.ZERO;
-    }
-
-    // --- CÁC HÀM GETTER / SETTER CƠ BẢN ---
-    public String getName() { return name; }
-    public BigDecimal getCash() { return cash; }
-    public void setCash(BigDecimal cash) { this.cash = cash; }
-    public BigDecimal getBet() { return bet; }
-    public void setBet(BigDecimal bet) { this.bet = bet; }
-    public Client getClient() { return client; }
-    public Action getAction() { return action; }
-    public void setAction(Action action) { this.action = action; }
-    public List<Card> getCards() { return cards; }
-    public void setCards(List<Card> cards) { this.cards = cards; }
-    public boolean isAllIn() { return isAllIn; }
-
-    // --- LOGIC GAME ĐƯỢC TABLE GỌI ---
-
-    public void resetHand() {
-        this.cards.clear();
-        this.bet = BigDecimal.ZERO;
-        this.action = null;
-        this.isAllIn = false;
-    }
-
-    public void resetBet() {
-        this.bet = BigDecimal.ZERO;
-    }
-
-    // Trừ tiền khi cược
-    public void payCash(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) return;
-
-        if (amount.compareTo(this.cash) >= 0) {
-            // Nếu số tiền phải trả >= tiền đang có -> All-in
-            this.bet = this.bet.add(this.cash); // Cược nốt số còn lại
-            this.cash = BigDecimal.ZERO;
-            this.isAllIn = true;
-        } else {
-            this.cash = this.cash.subtract(amount);
-            // Lưu ý: Việc cộng vào this.bet thường được xử lý ở Table hoặc gọi setBet riêng
-            // Nhưng để an toàn logic trừ tiền:
-            // this.bet = this.bet.add(amount);
-        }
-    }
-
-    public void postSmallBlind(BigDecimal amount) {
-        this.action = new oop2.demo.api.actions.SmallBlindAction();
-        payCash(amount);
-        this.bet = amount;
-    }
-
-    public void postBigBlind(BigDecimal amount) {
-        this.action = new oop2.demo.api.actions.BigBlindAction();
-        payCash(amount);
-        this.bet = amount;
-    }
-
-    public void win(BigDecimal amount) {
-        this.cash = this.cash.add(amount);
+        this.client = client;
+        this.hand = new Hand();
+        resetHand();
     }
 
     /**
-     * Tạo một bản sao công khai của người chơi này để gửi cho đối thủ.
-     * MỤC ĐÍCH: Ẩn bài tẩy (Cards) và ẩn kết nối Client.
+     * @return client điều khiển người chơi
+     */
+    public Client getClient() {
+        return client;
+    }
+
+    /**
+     * Chuẩn bị cho một ván mới
+     */
+    public void resetHand() {
+        hasCards = false;
+        hand.removeAllCards();
+        resetBet();
+    }
+
+    /**
+     * Reset tiền cược của người chơi
+     */
+    public void resetBet() {
+        bet = BigDecimal.ZERO;
+        action = (hasCards() && BigDecimal.ZERO.equals(cash)) ? Action.ALL_IN : null;
+    }
+
+    /**
+     * Thiết lập 2 lá bài tẩy
+     *
+     * @param cards danh sách bài
+     */
+    public void setCards(List<Card> cards) {
+        hand.removeAllCards();
+        if (cards != null) {
+            if (cards.size() == 2) {
+                hand.addCards(cards);
+                hasCards = true;
+                System.out.format("[CHEAT] %s's cards:\t%s\n", name, hand);
+            } else {
+                throw new IllegalArgumentException("Số lượng bài không hợp lệ");
+            }
+        }
+    }
+
+    /**
+     * @return true nếu đã có bài tẩy
+     */
+    public boolean hasCards() {
+        return hasCards;
+    }
+
+    /**
+     * @return tên người chơi
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return số tiền hiện có
+     */
+    public BigDecimal getCash() {
+        return cash;
+    }
+
+    /**
+     * @return số tiền đang cược
+     */
+    public BigDecimal getBet() {
+        return bet;
+    }
+
+    /**
+     * Cập nhật tiền cược
+     *
+     * @param bet số tiền cược
+     */
+    public void setBet(BigDecimal bet) {
+        this.bet = bet;
+    }
+
+    /**
+     * @return hành động gần nhất
+     */
+    public Action getAction() {
+        return action;
+    }
+
+    /**
+     * Cập nhật hành động
+     *
+     * @param action hành động mới
+     */
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
+    /**
+     * @return true nếu người chơi đã all-in
+     */
+    public boolean isAllIn() {
+        return hasCards() && BigDecimal.ZERO.equals(cash);
+    }
+
+    /**
+     * @return mảng bài tẩy
+     */
+    public Card[] getCards() {
+        return hand.getCards();
+    }
+
+    /**
+     * Đặt tiền small blind
+     *
+     * @param blind số tiền blind
+     */
+    public void postSmallBlind(BigDecimal blind) {
+        action = Action.SMALL_BLIND;
+        cash = cash.subtract(blind);
+        bet = bet.add(blind);
+    }
+
+    /**
+     * Đặt tiền big blind
+     *
+     * @param blind số tiền blind
+     */
+    public void postBigBlind(BigDecimal blind) {
+        action = Action.BIG_BLIND;
+        cash = cash.subtract(blind);
+        bet = bet.add(blind);
+    }
+
+    /**
+     * Trả tiền cược
+     *
+     * @param amount số tiền phải trả
+     */
+    public void payCash(BigDecimal amount) {
+        if (amount.compareTo(cash) > 0) {
+            throw new IllegalStateException("Người chơi không đủ tiền để trả!");
+        }
+        cash = cash.subtract(amount);
+    }
+
+    /**
+     * Nhận tiền thắng
+     *
+     * @param amount số tiền thắng
+     */
+    public void win(BigDecimal amount) {
+        cash = cash.add(amount);
+    }
+
+    /**
+     * Tạo bản sao chỉ chứa thông tin công khai
+     *
+     * @return player clone
      */
     public Player publicClone() {
-        Player clone = new Player(this.name, this.cash);
-        clone.setBet(this.bet);
-        clone.setAction(this.action);
-        clone.isAllIn = this.isAllIn;
-        // KHÔNG set cards cho clone (để bài null hoặc rỗng) -> Đối thủ không soi được bài
+        Player clone = new Player(name, cash, null);
+        clone.hasCards = hasCards;
+        clone.bet = bet;
+        clone.action = action;
         return clone;
     }
 
     @Override
     public String toString() {
-        return null;
-    }
-
-    public void setClient(PlayerHandler playerHandler) {
-        client = playerHandler;
+        return name;
     }
 }
