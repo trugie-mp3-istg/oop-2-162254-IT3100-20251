@@ -1,53 +1,123 @@
 package oop2.demo.api.features;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Pot implements Serializable {
-    private BigDecimal bet;
-    private Set<Player> contributors; // Khai báo biến
+/**
+ * Lớp Pot đại diện cho một pot (quỹ cược) mà một hoặc nhiều người chơi đã đóng góp.
+ *
+ * Mỗi pot có một mức cược cố định áp dụng cho tất cả người chơi tham gia.
+ * Trong trường hợp call / bet / raise không đủ (partial),
+ * pot sẽ được tách bằng phương thức {@link #split}.
+ */
+public class Pot {
 
+    /** Mức cược áp dụng cho pot này */
+    private BigDecimal bet;
+
+    /** Tập các người chơi đã đóng góp vào pot */
+    public final Set<Player> contributors;
+
+    /**
+     * Khởi tạo pot
+     *
+     * @param bet mức cược của pot
+     */
     public Pot(BigDecimal bet) {
         this.bet = bet;
-        this.contributors = new HashSet<>(); // <--- QUAN TRỌNG: Phải có dòng này để tránh NullPointerException
+        contributors = new HashSet<>();
     }
 
-    // Sửa lỗi UnsupportedOperationException: Phải trả về giá trị thật
+    /**
+     * @return mức cược của pot
+     */
     public BigDecimal getBet() {
-        return this.bet;
+        return bet;
     }
 
-    public void addContributer(Player p) {
-        this.contributors.add(p);
-    }
-
-    public boolean hasContributer(Player p) {
-        return this.contributors.contains(p);
-    }
-
+    /**
+     * @return danh sách người chơi đã đóng góp (chỉ đọc)
+     */
     public Set<Player> getContributors() {
-        return this.contributors;
+        return Collections.unmodifiableSet(contributors);
     }
 
+    /**
+     * Thêm một người chơi vào danh sách đóng góp
+     *
+     * @param player người chơi
+     */
+    public void addContributer(Player player) {
+        contributors.add(player);
+    }
+
+    /**
+     * Kiểm tra một người chơi có đóng góp vào pot hay không
+     *
+     * @param player người chơi
+     * @return true nếu đã đóng góp, ngược lại false
+     */
+    public boolean hasContributer(Player player) {
+        return contributors.contains(player);
+    }
+
+    /**
+     * Tính tổng giá trị của pot
+     *
+     * @return tổng tiền trong pot
+     */
     public BigDecimal getValue() {
-        return bet.multiply(new BigDecimal(contributors.size()));
+        return bet.multiply(new BigDecimal(String.valueOf(contributors.size())));
     }
 
-    public Pot split(Player splitter, BigDecimal partialBet) {
-        Pot excessPot = new Pot(this.bet.subtract(partialBet));
-        // Copy người chơi cũ sang Pot mới
-        for (Player p : this.contributors) {
-            excessPot.addContributer(p);
+    /**
+     * Tách pot trong trường hợp người chơi call / bet / raise không đủ tiền.
+     *
+     * Pot hiện tại sẽ giữ phần cược thấp hơn,
+     * pot mới sẽ chứa phần tiền còn lại.
+     *
+     * @param player     người chơi thực hiện partial
+     * @param partialBet số tiền thực sự đã cược
+     * @return pot mới chứa phần còn lại
+     */
+    public Pot split(Player player, BigDecimal partialBet) {
+        Pot pot = new Pot(bet.subtract(partialBet));
+        for (Player contributer : contributors) {
+            pot.addContributer(contributer);
         }
-        this.bet = partialBet;
-        this.addContributer(splitter);
-        return excessPot;
+        bet = partialBet;
+        contributors.add(player);
+        return pot;
+    }
+
+    /**
+     * Xóa toàn bộ dữ liệu của pot
+     */
+    public void clear() {
+        bet = BigDecimal.ZERO;
+        contributors.clear();
     }
 
     @Override
     public String toString() {
-        return "Pot Value: " + getValue();
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf(bet));
+        sb.append(": {");
+        boolean isFirst = true;
+        for (Player contributor : contributors) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(", ");
+            }
+            sb.append(contributor.getName());
+        }
+        sb.append('}');
+        sb.append(" (Total: ");
+        sb.append(String.valueOf(getValue()));
+        sb.append(')');
+        return sb.toString();
     }
 }

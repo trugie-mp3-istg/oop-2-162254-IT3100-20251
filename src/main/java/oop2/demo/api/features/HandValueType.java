@@ -1,32 +1,68 @@
 package oop2.demo.api.features;
 
-import java.io.Serializable;
-
 /**
- * Enum các loại bài Poker (Thùng phá sảnh, Tứ quý, Cù lũ...).
- * Có kèm giá trị số (value) để so sánh mạnh yếu.
+ * Các loại giá trị tay bài trong Poker.
  */
-public enum HandValueType implements Serializable {
+public enum HandValueType {
 
-    ROYAL_FLUSH("a Royal Flush", 9),
-    STRAIGHT_FLUSH("a Straight Flush", 8),
+    /** Royal Flush (Straight Flush cao nhất với lá Át). */
+    ROYAL_FLUSH("Royal Flush", 9),
+
+    /** Straight Flush (Straight + Flush, không phải Át cao nhất). */
+    STRAIGHT_FLUSH("Straight Flush", 8),
+
+    /** Four of a Kind (4 lá bài cùng rank). */
     FOUR_OF_A_KIND("Four of a Kind", 7),
-    FULL_HOUSE("a Full House", 6),
-    FLUSH("a Flush", 5),
-    STRAIGHT("a Straight", 4),
+
+    /** Full House (1 bộ ba + 1 đôi). */
+    FULL_HOUSE("Full House", 6),
+
+    /** Flush (5 lá cùng chất). */
+    FLUSH("Flush", 5),
+
+    /** Straight (5 lá liên tiếp). */
+    STRAIGHT("Straight", 4),
+
+    /** Three of a Kind (3 lá cùng rank). */
     THREE_OF_A_KIND("Three of a Kind", 3),
+
+    /** Two Pairs (2 đôi). */
     TWO_PAIRS("Two Pairs", 2),
+
+    /** One Pair (1 đôi). */
     ONE_PAIR("One Pair", 1),
-    HIGH_CARD("a High Card", 0);
 
-    private String description;
-    private int value;
+    /** High Card (lá bài cao nhất). */
+    HIGH_CARD("High Card", 0);
 
+    /** Mô tả loại tay bài */
+    private final String description;
+
+    /** Giá trị số dùng để so sánh tay bài */
+    private final int value;
+
+    /**
+     * Khởi tạo loại giá trị tay bài
+     *
+     * @param description mô tả tay bài
+     * @param value       giá trị số tương ứng
+     */
     HandValueType(String description, int value) {
         this.description = description;
         this.value = value;
     }
 
-    public String getDescription() { return description; }
-    public int getValue() { return value; }
+    /**
+     * @return mô tả tay bài
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @return giá trị số của tay bài
+     */
+    public int getValue() {
+        return value;
+    }
 }
