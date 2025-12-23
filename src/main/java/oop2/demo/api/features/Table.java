@@ -269,4 +269,9 @@ public class Table {
         for (Pot p : pots) total = total.add(p.getValue());
         return total;
     }
+
+    public List<Card> getBoardCards() {
+        // Trả về list bài chung (board)
+        return this.board;
+    }
 }
