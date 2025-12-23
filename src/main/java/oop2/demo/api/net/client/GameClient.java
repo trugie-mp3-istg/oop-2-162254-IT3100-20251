@@ -115,19 +115,27 @@ public class GameClient {
     // Logic tìm IP Server (UDP) - Giữ nguyên của bạn là ổn
     public static String findServerIP() {
         try (DatagramSocket socket = new DatagramSocket(DISCOVERY_PORT, InetAddress.getByName("0.0.0.0"))) {
-            socket.setSoTimeout(5000);
-            // ... (Code cũ của bạn ok rồi)
+            socket.setSoTimeout(5000); // đợi tối đa 5s
+            socket.setBroadcast(true);
+            System.out.println("[CLIENT] Searching for server...");
+
             byte[] buf = new byte[1024];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
             socket.receive(packet);
-
             String msg = new String(packet.getData(), 0, packet.getLength());
+
             if (msg.startsWith("SERVER_IP:")) {
-                return msg.split(":")[1];
+                String[] parts = msg.split(":");
+                String serverIP = parts[1];
+                int port = Integer.parseInt(parts[2]);
+                System.out.println("[CLIENT] Found server at " + serverIP + ":" + port);
+                return serverIP;
             }
+        } catch (SocketTimeoutException e) {
+            System.out.println("[CLIENT] No server found in LAN.");
         } catch (Exception e) {
-            System.out.println("[CLIENT] Server scan timeout. Defaulting to localhost.");
+            e.printStackTrace();
         }
-        return "127.0.0.1";
+        return null;
     }
 }

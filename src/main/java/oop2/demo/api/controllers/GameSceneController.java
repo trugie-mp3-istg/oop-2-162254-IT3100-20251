@@ -80,7 +80,7 @@ public class GameSceneController {
     }
 
     private void connectToServer() {
-        String ip = "localhost"; // GameClient.findServerIP();
+        String ip = GameClient.findServerIP();
         System.out.println("Connecting as " + playerName + "...");
         client = new GameClient(ip, serverPort, playerName, this::handleServerData);
     }
@@ -162,7 +162,7 @@ public class GameSceneController {
         };
         int value = card.getRank() + 2;
         try {
-            String path = String.format("/graphics/%s%02d.png", suit, value);
+            String path = String.format("/graphics/%s%d.png", suit, value);
             view.setImage(new Image(getClass().getResource(path).toExternalForm()));
         } catch (Exception e) {
             System.err.println("Missing img: " + suit + value);

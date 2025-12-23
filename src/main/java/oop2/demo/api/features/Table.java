@@ -5,6 +5,7 @@ import oop2.demo.api.actions.BetAction;
 import oop2.demo.api.actions.RaiseAction;
 
 import java.math.BigDecimal;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,7 +80,7 @@ public class Table {
     public Table(TableType type, BigDecimal bigBlind) {
         this.tableType = type;
         this.bigBlind = bigBlind;
-        players = new ArrayList<>();
+        players = new CopyOnWriteArrayList<>();
         activePlayers = new ArrayList<>();
         deck = new Deck();
         board = new ArrayList<>();

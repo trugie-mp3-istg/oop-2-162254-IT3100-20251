@@ -1,5 +1,6 @@
 package oop2.demo.api.features;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 import oop2.demo.api.actions.Action;
@@ -10,13 +11,13 @@ import oop2.demo.api.actions.Action;
  * Hành vi của người chơi được ủy quyền cho {@link Client},
  * có thể là người chơi thật hoặc bot AI.
  */
-public class Player {
+public class Player implements Serializable {
 
     /** Tên người chơi */
     private final String name;
 
     /** Client điều khiển hành vi của người chơi */
-    private final Client client;
+    private final transient Client client;
 
     /** Tay bài của người chơi */
     private final Hand hand;

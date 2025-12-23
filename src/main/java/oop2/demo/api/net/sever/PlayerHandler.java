@@ -88,6 +88,7 @@ public class PlayerHandler extends Thread implements Client {
             out.reset(); // Rất quan trọng để tránh lỗi cache object cũ
         } catch (IOException e) {
             System.out.println("Error sending to " + (playerLogic != null ? playerLogic.getName() : "Unknown"));
+            e.printStackTrace();
             close();
         }
     }
