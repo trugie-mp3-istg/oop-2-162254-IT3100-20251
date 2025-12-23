@@ -50,7 +50,7 @@ public class GameSceneController {
     private ImageView[] boardViews;
 
 
-    final int serverPort = 5000;
+    final int serverPort = 5555;
 
     private String playerName;
     private GameClient client;
@@ -85,8 +85,6 @@ public class GameSceneController {
             }
         });
     }
-
-
 
     private void updatePlayer(Player player) {
         var hand = player.getCards();

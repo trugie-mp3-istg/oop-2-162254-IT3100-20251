@@ -39,7 +39,7 @@
                 </HBox>
 
                 <HBox fx:id="Player1" layoutX="30.0" layoutY="99.0" prefHeight="64.0" prefWidth="128.0" />
-                <HBox fx:id="Player3" layoutX="30.0" layoutY="225.0" prefHeight="64.0" prefWidth="128.0" />
+                <HBox fx:id="Player3" layoutX="30.0" layoutY="276.0" prefHeight="64.0" prefWidth="128.0" />
                 <HBox fx:id="Player2" layoutX="647.0" layoutY="99.0" prefHeight="64.0" prefWidth="128.0" />
                 <HBox fx:id="Player4" layoutX="647.0" layoutY="276.0" prefHeight="64.0" prefWidth="128.0" />
 
