@@ -221,11 +221,11 @@ public class Client{
                 }
 
                 if(message[2].equals("Fold")){
-                    for(int i=0; i<players.size(); i++){
-                        if(players.get(i).username.equals(message[1])){
-                            players.remove(i);
-                        }
-                    }
+//                    for(int i=0; i<players.size(); i++){
+//                        if(players.get(i).username.equals(message[1])){
+//                            players.remove(i);
+//                        }
+//                    }
                 }
                 break;
 
