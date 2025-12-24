@@ -11,7 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.Socket;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +42,11 @@ public class Client{
         canLogout = true;
 
         try {
-            socket = new Socket("localhost",7777);
+            String ip = findServerIP();
+            if (ip == null) {
+                ip = "localhost"; // Nếu không thấy thì thử tìm chính mình (dự phòng)
+            }
+            socket = new Socket(ip,7777);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(),true);
         } catch (IOException e) {
@@ -394,6 +398,44 @@ public class Client{
 
     public void setWaitController(WaitController wc){
         this.wc = wc;
+    }
+
+    public String findServerIP() {
+        System.out.println("Đang tìm Server trong mạng LAN...");
+        DatagramSocket c = null;
+        try {
+            c = new DatagramSocket();
+            c.setBroadcast(true);
+            c.setSoTimeout(5000); // Chỉ tìm trong 5 giây, không thấy thì thôi
+
+            byte[] sendData = "DISCOVER_POKER_SERVER".getBytes();
+
+            // Gửi tin nhắn đến địa chỉ Broadcast (255.255.255.255)
+            // Mọi máy trong mạng LAN đều sẽ nhận được tin này
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 8888);
+            c.send(sendPacket);
+
+            // Chờ Server trả lời
+            byte[] recvBuf = new byte[1024];
+            DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
+            c.receive(receivePacket);
+
+            String message = new String(receivePacket.getData(), 0, receivePacket.getLength());
+            if (message.equals("POKER_SERVER_HERE")) {
+                // Lấy được IP của người trả lời
+                String serverIP = receivePacket.getAddress().getHostAddress();
+                System.out.println("Tìm thấy Server tại: " + serverIP);
+                return serverIP;
+            }
+
+        } catch (SocketTimeoutException e) {
+            System.out.println("Hết giờ! Không tìm thấy Server.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (c != null) c.close();
+        }
+        return null; // Không tìm thấy
     }
 }
 

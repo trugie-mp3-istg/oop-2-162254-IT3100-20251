@@ -3,6 +3,8 @@ package com.poker.server;
 import com.poker.model.Hand;
 
 import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -53,7 +55,39 @@ public class Server implements Runnable{
         waitingUsers = new ArrayList<>();
         table1 = new Table();
         table2 = new Table();
+        new Thread(() -> {
+            try {
+                // Mở cổng 8888 để nghe
+                DatagramSocket udpSocket = new DatagramSocket(8888, java.net.InetAddress.getByName("0.0.0.0"));
+                udpSocket.setBroadcast(true);
 
+                byte[] buffer = new byte[1024];
+                System.out.println(">>> Đã bật chức năng tìm kiếm IP (UDP Port 8888)");
+
+                while (true) {
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                    udpSocket.receive(packet); // Chờ Client hét lên "DISCOVER_..."
+
+                    String message = new String(packet.getData(), 0, packet.getLength());
+
+                    // Nếu đúng mật khẩu Client gửi
+                    if (message.equals("DISCOVER_POKER_SERVER")) {
+                        String response = "POKER_SERVER_HERE";
+                        byte[] sendData = response.getBytes();
+
+                        // Gửi trả lại IP cho Client đó
+                        DatagramPacket sendPacket = new DatagramPacket(
+                                sendData, sendData.length, packet.getAddress(), packet.getPort()
+                        );
+                        udpSocket.send(sendPacket);
+                        System.out.println(">>> Đã gửi địa chỉ IP cho: " + packet.getAddress().getHostAddress());
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Lỗi UDP: Không thể bật chức năng tìm kiếm IP.");
+            }
+        }).start(); // Nhớ có .start() để nó chạy song song
         try {
             ServerSocket ss = new ServerSocket(7777);
             while (true){
