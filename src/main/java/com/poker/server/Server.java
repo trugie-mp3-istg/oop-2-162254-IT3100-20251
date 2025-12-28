@@ -1,8 +1,13 @@
 package com.poker.server;
 
-import com.poker.model.Hand;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
@@ -11,14 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import com.poker.model.Hand;
+
 public class Server implements Runnable{
 
     private BufferedReader in;
     public PrintWriter out;
 
-    private boolean isLoggedIn;
+    public boolean isLoggedIn;
     public boolean isTurn;
     public boolean isFolded;
+    public boolean isAllIn;
 
     public Hand hand;
     public String username;
@@ -39,6 +47,7 @@ public class Server implements Runnable{
 
         isLoggedIn = false;
         isFolded = true;
+        isAllIn = false;
         username = null;
         chips = 0;
 
@@ -108,12 +117,65 @@ public class Server implements Runnable{
         while(true){
             try {
                 String data = in.readLine();
+                
+                // Nếu client disconnect (in.readLine() return null)
+                if(data == null) {
+                    handleClientDisconnect();
+                    break;
+                }
+                
                 System.out.println(data);
                 parseData(data);
             } catch (IOException e) {
-                continue;
+                handleClientDisconnect();
+                break;
             }
         }
+    }
+    
+    // Xử lí logout tự động nếu ngắt kết nối
+    private void handleClientDisconnect() {
+        System.out.println("Client disconnect: " + username);
+        
+        if(!isLoggedIn) return; // Chưa login thì không cần xử lý
+        
+        // Logout tự động
+        isLoggedIn = false;
+        
+        if(table != null) {
+            table.sendDataToAll("logout#" + username);
+            
+            if(isTurn){
+                isTurn = false;
+                table.changeTurn();
+                table.inGamePlayers.remove(this);
+                table.players.remove(this);
+                table.whichPlayerTurn--;
+
+                if(table.checkNumber == table.inGamePlayers.size())
+                    table.changeRound();
+
+                if(table.inGamePlayers.size() == 1){
+                    table.Reset();
+                }
+            }
+            else {
+                if(!isFolded){
+                    table.inGamePlayers.remove(this);
+                    table.players.remove(this);
+                    table.whichPlayerTurn--;
+                    if(table.inGamePlayers.size() == 1){
+                        table.Reset();
+                    }
+                }
+                else {
+                    table.players.remove(this);
+                }
+            }
+        }
+        
+        loggedInUsers.remove(this);
+        waitingUsers.remove(this);
     }
 
     private void parseData(String data) {
@@ -144,12 +206,34 @@ public class Server implements Runnable{
 
             case "call":
                 table.sendDataToAll("move#" + username + "#Call");
-                decreaseChips(table.currentBet - selfBet);
-                table.pot += table.currentBet - selfBet;
-                selfBet = table.currentBet;
+                
+                // Calculate how much more the player needs to bet
+                int amountNeeded = table.currentBet - selfBet;
+                
+                // If player doesn't have enough chips, they go all-in with what they have
+                if (amountNeeded > chips) {
+                    amountNeeded = chips;  // Bet all remaining chips
+                    isAllIn = true;  // Player is now all-in
+                }
+                
+                decreaseChips(amountNeeded);
+                table.pot += amountNeeded;
+                selfBet += amountNeeded;  // Update bet, not replace it
 
                 table.sendDataToAll("pot#" + String.valueOf(table.pot));
                 table.changeTurn();
+                // Check if all non-all-in players have acted
+                int callNonAllInCount = 0;
+                int callNonAllInActedCount = 0;
+                for (Server p : table.inGamePlayers) {
+                    if (!p.isAllIn) {
+                        callNonAllInCount++;
+                        if (p.selfBet == table.currentBet) callNonAllInActedCount++;
+                    }
+                }
+                if(callNonAllInCount > 0 && callNonAllInActedCount == callNonAllInCount) {
+                    table.changeRound();
+                }
                 isTurn = false;
                 break;
 
@@ -157,19 +241,33 @@ public class Server implements Runnable{
                 table.sendDataToAll("move#" + username + "#Check");
                 table.checkNumber++;
                 table.changeTurn();
-                if(table.checkNumber == table.inGamePlayers.size())
+                // Count only non-all-in players for showdown check
+                int checkNonAllInCount = 0;
+                for (Server p : table.inGamePlayers) {
+                    if (!p.isAllIn) checkNonAllInCount++;
+                }
+                if(table.checkNumber == checkNonAllInCount)
                     table.changeRound();
                 isTurn = false;
                 break;
 
             case "raise":
-                table.sendDataToAll("move#" + username + "#Raise " + message[1]);
+                int raiseAmount = Integer.parseInt(message[1]);
+                
+                // Limit raise to available chips
+                if (raiseAmount > chips) {
+                    raiseAmount = chips;  // Can't raise more than you have
+                    isAllIn = true;  // Going all-in
+                }
+                
+                table.sendDataToAll("move#" + username + "#Raise " + raiseAmount);
+                // Only count checks from non-all-in players
                 table.checkNumber = 0;
 
-                table.currentBet = Integer.parseInt(message[1]);
-                decreaseChips(table.currentBet - selfBet);
-                table.pot += table.currentBet - selfBet;
-                selfBet = Integer.parseInt(message[1]);
+                table.currentBet = raiseAmount;
+                decreaseChips(raiseAmount - selfBet);
+                table.pot += raiseAmount - selfBet;
+                selfBet = raiseAmount;
 
                 table.sendDataToAll("pot#" + String.valueOf(table.pot));
                 table.sendDataToAll("currentbet#" + String.valueOf(table.currentBet));
@@ -186,12 +284,22 @@ public class Server implements Runnable{
                 table.inGamePlayers.remove(this);
                 table.whichPlayerTurn--;
 
-                if(table.checkNumber == table.inGamePlayers.size())
+                // Check if remaining players have all checked (only count non-all-in players)
+                int foldNonAllInCount = 0;
+                for (Server p : table.inGamePlayers) {
+                    if (!p.isAllIn) foldNonAllInCount++;
+                }
+                if(foldNonAllInCount > 0 && table.checkNumber == foldNonAllInCount)
                     table.changeRound();
 
                 if(table.inGamePlayers.size() == 1){
                     table.Reset();
                 }
+                break;
+
+            case "allin":
+                int allInAmount = chips;  // All remaining chips go into pot
+                handleAllIn(allInAmount);
                 break;
 
             case "logout":
@@ -200,6 +308,8 @@ public class Server implements Runnable{
                     + table.players.size() + " players, isStarted: " + table.isStarted);
                 
                 updateChips();
+                // Reset login status to allow re-login
+                isLoggedIn = false;
                 table.sendDataToAll("logout#" + username);
 
                 boolean wasLeader = (this.playerIndex == 0);
@@ -287,6 +397,7 @@ public class Server implements Runnable{
 
             case "logoutwait":
                 System.out.println("[Logout wait] " + username + " leaves waiting room");
+                isLoggedIn = false;
                 loggedInUsers.remove(this);
                 waitingUsers.remove(this);
                 break;
@@ -459,6 +570,15 @@ public class Server implements Runnable{
     }
 
     private void initiateUserEntry(String username){
+        // Kiểm tra xem username này đã đăng nhập chưa
+        for (Server user : loggedInUsers) {
+            if (user.username.equals(username)) {
+                out.println("decline"); // từ chối đăng nhập
+                isLoggedIn = false;
+                return;
+            }
+        }
+        
         isLoggedIn = true;
         this.username = username;
         loggedInUsers.add(this);
@@ -650,6 +770,34 @@ public class Server implements Runnable{
         
         System.out.println("[Reset table end] Table " + getTableNumber(table) 
             + " is ready for new players! (isStarted = false)");
+    /**
+     * Handles the all-in action: player bets all remaining chips.
+     * @param amount The amount going all-in
+     */
+    public void handleAllIn(int amount) {
+        if (amount <= 0) return;
+
+        // Mark player as all-in
+        isAllIn = true;
+        isTurn = false;
+
+        // Deduct chips and add to pot
+        decreaseChips(amount);
+        int actualBet = amount + selfBet;  // Total bet including previous
+
+        // Update selfBet to reflect total commitment
+        selfBet = actualBet;
+
+        // Notify table to handle side pot calculation
+        table.handleAllIn(this, actualBet);
+
+        // Broadcast all-in action to all clients
+        table.sendDataToAll("move#" + username + "#All-in " + amount);
+        table.sendDataToAll("pot#" + String.valueOf(table.getTotalPot()));
+        table.sendDataToAll("chips#" + username + "#" + this.chips);
+
+        // Advance to next player
+        table.changeTurn();
     }
 
     private void resetTableForNewGameKeepLeader(Table table, Server leader) {

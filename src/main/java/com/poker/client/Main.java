@@ -25,6 +25,22 @@ public class Main extends Application {
 
         stage.setTitle("Online Poker - Log In");
         stage.setScene(new Scene(root, 1000, 650));
+        
+        // Xử lí tắt ứng dụng khi người dùng không bấm logout mà thoát bằng cách khác
+        stage.setOnCloseRequest(event -> {
+            try {
+                if(client != null && client.socket != null && !client.socket.isClosed()) {
+                    if(client.username != null) {
+                        // Gửi lệnh logout trước khi đóng
+                        client.out.println("logout");
+                    }
+                    client.socket.close();
+                }
+            } catch (Exception e) {
+                System.out.println("Error closing socket: " + e.getMessage());
+            }
+        });
+        
         stage.show();
 
     }
