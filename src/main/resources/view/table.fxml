@@ -1,72 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
-<AnchorPane stylesheets="@fontstyle.css" minHeight="-Infinity" minWidth="-Infinity" prefHeight="860.0" prefWidth="1246.0" style="-fx-background-color: #957947;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.poker.client.TableController">
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Bloom?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #957947;" stylesheets="@fontstyle.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.poker.client.TableController">
    <children>
-      <ImageView fitHeight="870.0" fitWidth="1266.0" layoutX="-8.0" layoutY="-9.0" pickOnBounds="true">
+      <ImageView fitHeight="800.0" fitWidth="1200.0" layoutX="0.0" layoutY="0.0" pickOnBounds="true">
          <image>
             <Image url="@/graphic/mainbg.jpg" />
          </image>
       </ImageView>
-      <ImageView fitHeight="144.0" fitWidth="180.0" layoutX="639.0" layoutY="3.0" pickOnBounds="true">
+      <ImageView fitHeight="144.0" fitWidth="180.0" layoutX="200.0" layoutY="620.0" pickOnBounds="true">
          <image>
             <Image url="@/graphic/spbubble.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="523.0" fitWidth="907.0" layoutX="182.0" layoutY="150.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="500.0" fitWidth="900.0" layoutX="150.0" layoutY="150.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/graphic/Table.png" />
          </image>
       </ImageView>
-      <HBox layoutX="406.0" layoutY="340.0" prefHeight="124.0" prefWidth="447.0">
+      <HBox layoutX="394.5" layoutY="320.0" prefHeight="124.0" prefWidth="447.0">
          <children>
-            <VBox fx:id="v1" prefHeight="200.0" prefWidth="100.0">
+            <VBox fx:id="v1">
                <children>
-                  <ImageView fx:id="cc1" fitHeight="132.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+                  <ImageView fx:id="cc1" fitHeight="110.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" smooth="false">
                      <image>
                         <Image url="@/graphic/download.jpg" />
                      </image></ImageView>
                </children></VBox>
-            <VBox fx:id="v2" prefHeight="75.0" prefWidth="83.0">
+            <VBox fx:id="v2">
                <children>
-                  <ImageView fx:id="cc2" fitHeight="132.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+                  <ImageView fx:id="cc2" fitHeight="110.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" smooth="false">
                      <image>
                         <Image url="@/graphic/download.jpg" />
                      </image></ImageView>
                </children></VBox>
-            <VBox fx:id="v3" prefHeight="146.0" prefWidth="145.0">
+            <VBox fx:id="v3">
                <children>
-                  <ImageView fx:id="cc3" fitHeight="133.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+                  <ImageView fx:id="cc3" fitHeight="110.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" smooth="false">
                      <image>
                         <Image url="@/graphic/download.jpg" />
                      </image></ImageView>
                </children></VBox>
-            <VBox fx:id="v4" prefHeight="200.0" prefWidth="100.0">
+            <VBox fx:id="v4">
                <children>
-                  <ImageView fx:id="cc4" fitHeight="134.0" fitWidth="99.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+                  <ImageView fx:id="cc4" fitHeight="110.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" smooth="false">
                      <image>
                         <Image url="@/graphic/download.jpg" />
                      </image></ImageView>
                </children>
             </VBox>
-            <VBox fx:id="v5" prefHeight="146.0" prefWidth="95.0">
+            <VBox fx:id="v5">
                <children>
-                  <ImageView fx:id="cc5" fitHeight="133.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+                  <ImageView fx:id="cc5" fitHeight="110.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true" smooth="false">
                      <image>
                         <Image url="@/graphic/download.jpg" />
                      </image></ImageView>
                </children></VBox>
          </children>
       </HBox>
-      <Button fx:id="check" layoutX="773.0" layoutY="653.0" mnemonicParsing="false" onAction="#check" prefHeight="37.0" prefWidth="75.0" style="-fx-background-color: blue; -fx-background-radius: 20;" text="Check" textFill="WHITE">
+      <Button fx:id="check" layoutX="930.0" layoutY="675.0" mnemonicParsing="false" onAction="#check" prefHeight="40.0" prefWidth="85.0" style="-fx-background-color: #4FCC33; -fx-background-radius: 20;" text="Check" textFill="WHITE">
       </Button>
-      <Button fx:id="fold" layoutX="873.0" layoutY="652.0" mnemonicParsing="false" onAction="#fold" style="-fx-background-color: #ffff00; -fx-background-radius: 20;" text="Fold" textFill="#0a0505">
+      <Button fx:id="fold" layoutX="830.0" layoutY="720.0" mnemonicParsing="false" onAction="#fold" prefHeight="40.0" prefWidth="85.0" style="-fx-background-color: #4FCC33; -fx-background-radius: 20;" text="Fold" textFill="WHITE">
       </Button>
-      <Button fx:id="raise" layoutX="956.0" layoutY="652.0" mnemonicParsing="false" onAction="#raise" prefHeight="37.0" prefWidth="87.0" style="-fx-background-color: red; -fx-background-radius: 20;" text="Raise" textFill="#0a0505">
+      <Button fx:id="raise" layoutX="930.0" layoutY="720.0" mnemonicParsing="false" onAction="#raise" prefHeight="40.0" prefWidth="85.0" style="-fx-background-color: #33A31A; -fx-background-radius: 20;" text="Raise" textFill="WHITE">
       </Button>
       <HBox layoutX="526.0" layoutY="493.0" prefHeight="78.0" prefWidth="134.0">
          <children>
@@ -86,63 +94,74 @@
                </children></VBox>
          </children>
       </HBox>
-      <TextField fx:id="raisebox" layoutX="1056.0" layoutY="656.0" prefHeight="37.0" prefWidth="137.0" style="-fx-background-color: #ffffff;">
+      <TextField fx:id="raisebox" layoutX="1050.0" layoutY="720.0" prefHeight="37.0" prefWidth="137.0" style="-fx-background-color: #ffffff;">
       </TextField>
-      <ImageView fx:id="card21" fitHeight="78.0" fitWidth="68.0" layoutX="225.0" layoutY="350.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="card21" fitHeight="78.0" fitWidth="60.0" layoutX="200.0" layoutY="330.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/graphic/download.jpg" />
          </image>
       </ImageView>
-      <ImageView fx:id="card22" fitHeight="78.0" fitWidth="68.0" layoutX="279.0" layoutY="350.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="card22" fitHeight="78.0" fitWidth="60.0" layoutX="260.0" layoutY="330.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/graphic/download.jpg" />
          </image>
       </ImageView>
-      <ImageView fx:id="card31" fitHeight="72.0" fitWidth="68.0" layoutX="315.0" layoutY="223.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="card31" fitHeight="78.0" fitWidth="60.0" layoutX="315.0" layoutY="190.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/graphic/download.jpg" />
          </image>
       </ImageView>
-      <ImageView fx:id="card32" fitHeight="72.0" fitWidth="61.0" layoutX="365.0" layoutY="223.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="card32" fitHeight="78.0" fitWidth="60.0" layoutX="375.0" layoutY="190.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/graphic/download.jpg" />
          </image>
       </ImageView>
-      <ImageView fx:id="card41" fitHeight="78.0" fitWidth="68.0" layoutX="838.0" layoutY="211.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="card41" fitHeight="78.0" fitWidth="60.0" layoutX="765.0" layoutY="190.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/graphic/download.jpg" />
          </image>
       </ImageView>
-      <ImageView fx:id="card42" fitHeight="78.0" fitWidth="68.0" layoutX="890.0" layoutY="211.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="card42" fitHeight="78.0" fitWidth="60.0" layoutX="825.0" layoutY="190.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/graphic/download.jpg" />
          </image>
       </ImageView>
-      <ImageView fx:id="card51" fitHeight="72.0" fitWidth="68.0" layoutX="938.0" layoutY="347.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="card51" fitHeight="78.0" fitWidth="60.0" layoutX="880.0" layoutY="330.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/graphic/download.jpg" />
          </image>
       </ImageView>
-      <ImageView fx:id="card52" fitHeight="72.0" fitWidth="68.0" layoutX="988.0" layoutY="347.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="card52" fitHeight="78.0" fitWidth="60.0" layoutX="940.0" layoutY="330.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/graphic/download.jpg" />
          </image>
       </ImageView>
-      <Text fx:id="chipID" layoutX="549.0" layoutY="244.0" strokeType="OUTSIDE" strokeWidth="0.0" text="POT">
-      </Text>
-      <Button layoutX="22.0" layoutY="25.0" mnemonicParsing="false" onAction="#logout" prefHeight="52.0" prefWidth="157.0" style="-fx-background-color: #adff2f; -fx-background-radius: 30;" text="Log Out" textFill="#0a0505">
+      <Text fx:id="chipID" fill="WHITE" layoutX="540.0" layoutY="140.0" strokeType="OUTSIDE" strokeWidth="0.0" text="POT:">
+         <font>
+            <Font name="Palatino Linotype Bold Italic" size="20.0" />
+         </font></Text>
+      <Button layoutX="22.0" layoutY="25.0" mnemonicParsing="false" onAction="#logout" prefHeight="52.0" prefWidth="157.0" style="-fx-background-color: #8A3333; -fx-background-radius: 30;" text="Log Out" textFill="WHITE">
       </Button>
-      <Text fx:id="pot" layoutX="625.0" layoutY="244.0" strokeType="OUTSIDE" strokeWidth="0.0" text="10000" wrappingWidth="107.0">
-      </Text>
-      <Button fx:id="call" layoutX="679.0" layoutY="653.0" mnemonicParsing="false" onAction="#call" prefHeight="37.0" prefWidth="75.0" style="-fx-background-color: Green; -fx-background-radius: 20;" text="Call" textFill="WHITE">
+      <Text fx:id="pot" fill="WHITE" layoutX="600.0" layoutY="140.0" strokeType="OUTSIDE" strokeWidth="0.0" text="10000" wrappingWidth="107.0">
+         <font>
+            <Font name="MS Gothic" size="20.0" />
+         </font>
+         <effect>
+            <Bloom />
+         </effect></Text>
+      <Button fx:id="call" layoutX="830.0" layoutY="675.0" mnemonicParsing="false" onAction="#call" prefHeight="40.0" prefWidth="85.0" style="-fx-background-color: #33A31A; -fx-background-radius: 20;" text="Call" textFill="WHITE">
       </Button>
-      <Text layoutX="546.0" layoutY="214.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" BET: ">
+      <Text fill="WHITE" layoutX="545.0" layoutY="110.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" BET: ">
+         <font>
+            <Font name="Palatino Linotype Italic" size="20.0" />
+         </font></Text>
+      <Text fx:id="bet" fill="WHITE" layoutX="600.0" layoutY="110.0" strokeType="OUTSIDE" strokeWidth="0.0" text="10" wrappingWidth="124.0">
+         <font>
+            <Font name="MS Gothic" size="20.0" />
+         </font></Text>
+      <Text fx:id="message" fill="#ffbcbc" layoutX="30.0" layoutY="120.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="201.6708984375">
       </Text>
-      <Text fx:id="bet" layoutX="602.0" layoutY="213.0" strokeType="OUTSIDE" strokeWidth="0.0" text="10" wrappingWidth="124.0">
-      </Text>
-      <Text fx:id="message" fill="#ffbcbc" layoutX="74.0" layoutY="657.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="201.6708984375">
-      </Text>
-      <Label layoutX="1054.0" layoutY="624.0" text="Raise amount" textFill="#67b9da">
+      <Label layoutX="1050.0" layoutY="695.0" text="Raise amount" textFill="#fff820">
       </Label>
       <ImageView fx:id="p1chip" fitHeight="46.0" fitWidth="38.0" layoutX="605.0" layoutY="543.0" pickOnBounds="true" preserveRatio="true" />
       <Circle fx:id="circle" fill="#1d9a38" layoutX="494.0" layoutY="559.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
@@ -150,41 +169,43 @@
       <Circle fx:id="circle3" fill="#1d9a38" layoutX="436.0" layoutY="259.0" radius="16.0" stroke="#23b21e" strokeType="INSIDE" visible="false" />
       <Circle fx:id="circle4" fill="#1d9a38" layoutX="799.0" layoutY="243.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" visible="false" />
       <Circle fx:id="circle5" fill="#1d9a38" layoutX="1007.0" layoutY="324.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" visible="false" />
-      <Circle fx:id="pot1" fill="#1d9a38" layoutX="598.0" layoutY="275.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
-      <Circle fx:id="pot3" fill="#1d9a38" layoutX="624.0" layoutY="295.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
-      <Circle fx:id="pot2" fill="#1d9a38" layoutX="656.0" layoutY="276.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
-      <Circle fx:id="pot4" fill="#1d9a38" layoutX="688.0" layoutY="291.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
-      <Circle fx:id="pot5" fill="#1d9a38" layoutX="656.0" layoutY="308.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
-      <Circle fx:id="pot6" fill="#1d9a38" layoutX="593.0" layoutY="308.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
-      <Circle fx:id="avatar2" fill="#798a9a" layoutX="137.0" layoutY="324.0" radius="62.0" stroke="#9e8f8d" strokeType="INSIDE" />
-      <TextField fx:id="p2" alignment="CENTER" layoutX="92.0" layoutY="383.0" prefHeight="42.0" prefWidth="91.0" style="-fx-background-color: #b0a0a0; -fx-text-fill: white;" text="Empty">
+      <Circle fx:id="pot1" fill="#1d9a38" layoutX="582.0" layoutY="259.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="pot3" fill="#1d9a38" layoutX="608.0" layoutY="279.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="pot2" fill="#1d9a38" layoutX="640.0" layoutY="260.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="pot4" fill="#1d9a38" layoutX="672.0" layoutY="275.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="pot5" fill="#1d9a38" layoutX="640.0" layoutY="292.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="pot6" fill="#1d9a38" layoutX="577.0" layoutY="292.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="avatar2" fill="#998b8b" layoutX="100.0" layoutY="320.0" opacity="0.64" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
+      <TextField fx:id="p2" alignment="CENTER" layoutX="55.0" layoutY="380.0" prefHeight="42.0" prefWidth="90.0" style="-fx-background-color: #998B8B; -fx-text-fill: white;" text="Empty">
       </TextField>
-      <TextField fx:id="c2" alignment="CENTER" layoutX="93.0" layoutY="425.0" prefHeight="38.0" prefWidth="87.0" style="-fx-background-color: #eeeeee;" text="-">
+      <TextField fx:id="c2" alignment="CENTER" layoutX="55.0" layoutY="425.0" prefHeight="38.0" prefWidth="90.0" style="-fx-background-color: #eeeeee;" text="-">
       </TextField>
-      <Circle fx:id="avatar1" fill="#798a9a" layoutX="490.0" layoutY="686.0" radius="62.0" stroke="#9e8f8d" strokeType="INSIDE" />
-      <TextField fx:id="p1" alignment="CENTER" layoutX="552.0" layoutY="665.0" prefHeight="42.0" prefWidth="91.0" style="-fx-background-color: #b0a0a0; -fx-text-fill: white;" text="Empty">
+      <Circle fx:id="avatar1" fill="#798a9a" layoutX="600.0" layoutY="715.0" radius="64.0" stroke="#9e8f8d" strokeType="INSIDE" />
+      <TextField fx:id="p1" alignment="CENTER" layoutX="680.0" layoutY="675.0" prefHeight="42.0" prefWidth="90.0" style="-fx-background-color: #b0a0a0; -fx-text-fill: white;" text="Empty">
       </TextField>
-      <TextField fx:id="c1" alignment="CENTER" layoutX="554.0" layoutY="707.0" prefHeight="38.0" prefWidth="87.0" style="-fx-background-color: #eeeeee;" text="-">
+      <TextField fx:id="c1" alignment="CENTER" layoutX="680.0" layoutY="720.0" prefHeight="38.0" prefWidth="90.0" style="-fx-background-color: #eeeeee;" text="-">
       </TextField>
-      <Circle fx:id="avatar3" fill="#798a9a" layoutX="276.0" layoutY="134.0" radius="53.0" stroke="#9e8f8d" strokeType="INSIDE" />
-      <TextField fx:id="p3" alignment="CENTER" layoutX="329.0" layoutY="77.0" prefHeight="42.0" prefWidth="91.0" style="-fx-background-color: #b0a0a0; -fx-text-fill: white;" text="Empty">
+      <Circle fx:id="avatar3" fill="#998b8b" layoutX="270.0" layoutY="120.0" opacity="0.64" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
+      <TextField fx:id="p3" alignment="CENTER" layoutX="330.0" layoutY="70.0" prefHeight="42.0" prefWidth="90.0" style="-fx-background-color: #998B8B; -fx-text-fill: white;" text="Empty">
       </TextField>
-      <TextField fx:id="c5" alignment="CENTER" layoutX="1084.0" layoutY="425.0" prefHeight="38.0" prefWidth="81.0" style="-fx-background-color: #eeeeee;" text="-">
+      <TextField fx:id="c5" alignment="CENTER" layoutX="1055.0" layoutY="425.0" prefHeight="38.0" prefWidth="90.0" style="-fx-background-color: #eeeeee;" text="-">
       </TextField>
-      <TextField fx:id="c4" alignment="CENTER" layoutX="987.0" layoutY="153.0" prefHeight="38.0" prefWidth="87.0" style="-fx-background-color: #eeeeee;" text="-">
+      <TextField fx:id="c4" alignment="CENTER" layoutX="780.0" layoutY="115.0" prefHeight="38.0" prefWidth="90.0" style="-fx-background-color: #eeeeee;" text="-">
       </TextField>
-      <TextField fx:id="c3" alignment="CENTER" layoutX="329.0" layoutY="115.0" prefHeight="38.0" prefWidth="91.0" style="-fx-background-color: #eeeeee;" text="-">
+      <TextField fx:id="c3" alignment="CENTER" layoutX="330.0" layoutY="115.0" prefHeight="38.0" prefWidth="90.0" style="-fx-background-color: #eeeeee;" text="-">
       </TextField>
-      <Circle fx:id="avatar5" fill="#798a9a" layoutX="1131.0" layoutY="331.0" radius="56.0" stroke="#9e8f8d" strokeType="INSIDE" />
-      <Circle fx:id="avatar4" fill="#798a9a" layoutX="927.0" layoutY="119.0" radius="56.0" stroke="#9e8f8d" strokeType="INSIDE" />
-      <TextField fx:id="p5" alignment="CENTER" layoutX="1079.0" layoutY="383.0" prefHeight="42.0" prefWidth="91.0" style="-fx-background-color: #b0a0a0; -fx-text-fill: #ffffff;" text="Empty">
+      <Circle fx:id="avatar5" fill="#998b8b" layoutX="1100.0" layoutY="320.0" opacity="0.64" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
+      <Circle fx:id="avatar4" fill="#998b8b" layoutX="930.0" layoutY="120.0" opacity="0.64" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
+      <TextField fx:id="p5" alignment="CENTER" layoutX="1055.0" layoutY="380.0" prefHeight="42.0" prefWidth="90.0" style="-fx-background-color: #998B8B; -fx-text-fill: #ffffff;" text="Empty">
       </TextField>
-      <TextField fx:id="p4" alignment="CENTER" layoutX="986.0" layoutY="113.0" prefHeight="42.0" prefWidth="91.0" style="-fx-background-color: #b0a0a0; -fx-text-fill: #ffffff;" text="Empty">
+      <TextField fx:id="p4" alignment="CENTER" layoutX="780.0" layoutY="70.0" prefHeight="42.0" prefWidth="90.0" style="-fx-background-color: #998B8B; -fx-text-fill: #ffffff;" text="Empty">
       </TextField>
-      <TextField fx:id="whichPturn" alignment="CENTER" layoutX="1054.0" layoutY="21.0" prefHeight="39.0" prefWidth="180.0" style="-fx-background-color: #12025b; -fx-text-fill: #ffffff;">
+      <TextField fx:id="whichPturn" alignment="CENTER" layoutX="1020.0" layoutY="20.0" prefHeight="39.0" prefWidth="180.0" style="-fx-background-color: #12025b; -fx-text-fill: #ffffff;">
       </TextField>
-      <Text fx:id="action" fill="#84fffb" layoutX="661.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="137.0">
-      </Text>
+      <Text fx:id="action" fill="#84fffb" layoutX="230.0" layoutY="670.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="137.0">
+         <font>
+            <Font size="20.0" />
+         </font></Text>
       <Text fx:id="action3" fill="WHITE" layoutX="329.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="116.0">
       </Text>
       <Text fx:id="action2" fill="WHITE" layoutX="100.0" layoutY="487.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="75.0">
@@ -196,7 +217,7 @@
             <Font name="Lucida Fax Demibold" size="19.0" />
          </font>
       </Text>
-      <ImageView fitHeight="124.0" fitWidth="180.0" layoutX="531.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="124.0" fitWidth="180.0" layoutX="50.0" layoutY="650.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@/graphic/dealer6.png" />
          </image>
