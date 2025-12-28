@@ -68,6 +68,8 @@
       </Button>
       <Button fx:id="raise" layoutX="956.0" layoutY="652.0" mnemonicParsing="false" onAction="#raise" prefHeight="37.0" prefWidth="87.0" style="-fx-background-color: red; -fx-background-radius: 20;" text="Raise" textFill="#0a0505">
       </Button>
+      <Button fx:id="allin" layoutX="1053.0" layoutY="652.0" mnemonicParsing="false" onAction="#allIn" prefHeight="37.0" prefWidth="100.0" style="-fx-background-color: #ff1493; -fx-background-radius: 20; -fx-font-weight: bold;" text="ALL-IN" textFill="WHITE">
+      </Button>
       <HBox layoutX="526.0" layoutY="493.0" prefHeight="78.0" prefWidth="134.0">
          <children>
             <VBox fx:id="v6" prefHeight="200.0" prefWidth="100.0">
@@ -86,7 +88,7 @@
                </children></VBox>
          </children>
       </HBox>
-      <TextField fx:id="raisebox" layoutX="1056.0" layoutY="656.0" prefHeight="37.0" prefWidth="137.0" style="-fx-background-color: #ffffff;">
+      <TextField fx:id="raisebox" layoutX="1053.0" layoutY="708.0" prefHeight="37.0" prefWidth="100.0" style="-fx-background-color: #ffffff;">
       </TextField>
       <ImageView fx:id="card21" fitHeight="78.0" fitWidth="68.0" layoutX="225.0" layoutY="350.0" pickOnBounds="true" preserveRatio="true">
          <image>
@@ -142,7 +144,7 @@
       </Text>
       <Text fx:id="message" fill="#ffbcbc" layoutX="74.0" layoutY="657.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="201.6708984375">
       </Text>
-      <Label layoutX="1054.0" layoutY="624.0" text="Raise amount" textFill="#67b9da">
+      <Label layoutX="1054.0" layoutY="689.0" text="Raise amount" textFill="#67b9da">
       </Label>
       <ImageView fx:id="p1chip" fitHeight="46.0" fitWidth="38.0" layoutX="605.0" layoutY="543.0" pickOnBounds="true" preserveRatio="true" />
       <Circle fx:id="circle" fill="#1d9a38" layoutX="494.0" layoutY="559.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
