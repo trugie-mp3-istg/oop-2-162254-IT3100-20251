@@ -106,12 +106,65 @@ public class Server implements Runnable{
         while(true){
             try {
                 String data = in.readLine();
+                
+                // Nếu client disconnect (in.readLine() return null)
+                if(data == null) {
+                    handleClientDisconnect();
+                    break;
+                }
+                
                 System.out.println(data);
                 parseData(data);
             } catch (IOException e) {
-                continue;
+                handleClientDisconnect();
+                break;
             }
         }
+    }
+    
+    // Xử lí logout tự động nếu ngắt kết nối
+    private void handleClientDisconnect() {
+        System.out.println("Client disconnect: " + username);
+        
+        if(!isLoggedIn) return; // Chưa login thì không cần xử lý
+        
+        // Logout tự động
+        isLoggedIn = false;
+        
+        if(table != null) {
+            table.sendDataToAll("logout#" + username);
+            
+            if(isTurn){
+                isTurn = false;
+                table.changeTurn();
+                table.inGamePlayers.remove(this);
+                table.players.remove(this);
+                table.whichPlayerTurn--;
+
+                if(table.checkNumber == table.inGamePlayers.size())
+                    table.changeRound();
+
+                if(table.inGamePlayers.size() == 1){
+                    table.Reset();
+                }
+            }
+            else {
+                if(!isFolded){
+                    table.inGamePlayers.remove(this);
+                    table.players.remove(this);
+                    table.whichPlayerTurn--;
+                    if(table.inGamePlayers.size() == 1){
+                        table.Reset();
+                    }
+                }
+                else {
+                    table.players.remove(this);
+                }
+            }
+        }
+        
+        loggedInUsers.remove(this);
+        waitingUsers.remove(this);
     }
 
     private void parseData(String data) {
@@ -194,6 +247,8 @@ public class Server implements Runnable{
 
             case "logout":
                 updateChips();
+                // Reset login status to allow re-login
+                isLoggedIn = false;
                 table.sendDataToAll("logout#" + username);
 
                 if(isTurn){
@@ -231,6 +286,7 @@ public class Server implements Runnable{
                 break;
 
             case "logoutwait":
+                isLoggedIn = false;
                 loggedInUsers.remove(this);
                 waitingUsers.remove(this);
                 break;
@@ -349,6 +405,15 @@ public class Server implements Runnable{
     }
 
     private void initiateUserEntry(String username){
+        // Kiểm tra xem username này đã đăng nhập chưa
+        for (Server user : loggedInUsers) {
+            if (user.username.equals(username)) {
+                out.println("decline"); // từ chối đăng nhập
+                isLoggedIn = false;
+                return;
+            }
+        }
+        
         isLoggedIn = true;
         this.username = username;
         loggedInUsers.add(this);

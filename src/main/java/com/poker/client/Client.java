@@ -91,6 +91,10 @@ public class Client{
                 tc.message.setText("Waiting for players...");
                 break;
 
+            case "decline":
+                lc.showErrorMessage("Account is already logged in!");
+                break;
+
             case "wait":
                 openWait();
                 break;
