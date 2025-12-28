@@ -1,0 +1,9 @@
+@font-face {
+    font-family: "balatro";
+    src: url("/font/balatro.otf");
+}
+
+.label, .button, .text-field, .password-field {
+    -fx-font-family: "balatro";
+    -fx-font-size: 20;
+}

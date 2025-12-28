@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="860.0" prefWidth="1246.0" style="-fx-background-color: #957947;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.poker.client.TableController">
+<AnchorPane stylesheets="@fontstyle.css" minHeight="-Infinity" minWidth="-Infinity" prefHeight="860.0" prefWidth="1246.0" style="-fx-background-color: #957947;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.poker.client.TableController">
    <children>
       <ImageView fitHeight="870.0" fitWidth="1266.0" layoutX="-8.0" layoutY="-9.0" pickOnBounds="true">
          <image>
@@ -63,17 +63,11 @@
          </children>
       </HBox>
       <Button fx:id="check" layoutX="773.0" layoutY="653.0" mnemonicParsing="false" onAction="#check" prefHeight="37.0" prefWidth="75.0" style="-fx-background-color: blue; -fx-background-radius: 20;" text="Check" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font></Button>
+      </Button>
       <Button fx:id="fold" layoutX="873.0" layoutY="652.0" mnemonicParsing="false" onAction="#fold" style="-fx-background-color: #ffff00; -fx-background-radius: 20;" text="Fold" textFill="#0a0505">
-         <font>
-            <Font name="System Bold" size="19.0" />
-         </font></Button>
+      </Button>
       <Button fx:id="raise" layoutX="956.0" layoutY="652.0" mnemonicParsing="false" onAction="#raise" prefHeight="37.0" prefWidth="87.0" style="-fx-background-color: red; -fx-background-radius: 20;" text="Raise" textFill="#0a0505">
-         <font>
-            <Font name="System Bold" size="19.0" />
-         </font></Button>
+      </Button>
       <HBox layoutX="526.0" layoutY="493.0" prefHeight="78.0" prefWidth="134.0">
          <children>
             <VBox fx:id="v6" prefHeight="200.0" prefWidth="100.0">
