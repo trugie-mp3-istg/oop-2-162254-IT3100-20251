@@ -263,7 +263,16 @@ public class Table {
             sendDataToAll("winner#" + "\" " + temp.username + " Won with a " + temp.hand.display() + "!\"");
             for (Server w : winnings.keySet()) {
                 w.chips += winnings.get(w);
-                sendDataToAll("chips#" + w.username + "#" + String.valueOf(w.chips));
+                // Check if player has no chips left after showdown
+                if(w.chips <= 0) {
+                    System.out.println("Player " + w.username + " has 0 or negative chips. Logging out.");
+                    w.isLoggedIn = false;
+                    sendDataToAll("logout#" + w.username);
+                    players.remove(w);
+                    inGamePlayers.remove(w);
+                } else {
+                    sendDataToAll("chips#" + w.username + "#" + String.valueOf(w.chips));
+                }
             }
             pot = 0;
         } else {
@@ -271,7 +280,28 @@ public class Table {
             sendDataToAll("winner#" + "\" " + temp.username + " Won with a " + temp.hand.display() + "!\"");
             temp.chips += pot;
             pot = 0;
-            sendDataToAll("chips#" + temp.username + "#" + String.valueOf(temp.chips));
+            if(temp.chips <= 0) {
+                System.out.println("Player " + temp.username + " has 0 or negative chips. Logging out.");
+                temp.isLoggedIn = false;
+                sendDataToAll("logout#" + temp.username);
+                players.remove(temp);
+                inGamePlayers.remove(temp);
+            } else {
+                sendDataToAll("chips#" + temp.username + "#" + String.valueOf(temp.chips));
+            }
+            
+            // Check if any other player has no chips left after showdown
+            java.util.List<Server> playersToRemove = new java.util.ArrayList<>();
+            for (Server p : players) {
+                if(p.chips <= 0) {
+                    System.out.println("Player " + p.username + " has 0 or negative chips. Logging out.");
+                    p.isLoggedIn = false;
+                    sendDataToAll("logout#" + p.username);
+                    playersToRemove.add(p);
+                    inGamePlayers.remove(p);
+                }
+            }
+            players.removeAll(playersToRemove);
         }
 
         sendDataToAll("pot#" + String.valueOf(pot));
@@ -322,8 +352,19 @@ public class Table {
         pot = 0;
 
         sendDataToAll("pot#" + String.valueOf(pot));
-        sendDataToAll("chips#" + player.username + "#" + String.valueOf(player.chips));
-
+        sendDataToAll("chips#" + player.username + "#" + String.valueOf(player.chips));        
+        // Check if any player has no chips left after showdown
+        java.util.List<Server> playersToRemove = new java.util.ArrayList<>();
+        for (Server p : players) {
+            if(p.chips <= 0) {
+                System.out.println("Player " + p.username + " has 0 or negative chips. Logging out.");
+                p.isLoggedIn = false;
+                sendDataToAll("logout#" + p.username);
+                playersToRemove.add(p);
+                inGamePlayers.remove(p);
+            }
+        }
+        players.removeAll(playersToRemove);
         /*wait in the interval*/
         for (Server playah : players) {
             playah.out.println("sleep");

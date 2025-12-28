@@ -23,7 +23,7 @@ public class Server implements Runnable{
     private BufferedReader in;
     public PrintWriter out;
 
-    private boolean isLoggedIn;
+    public boolean isLoggedIn;
     public boolean isTurn;
     public boolean isFolded;
     public boolean isAllIn;
@@ -204,9 +204,19 @@ public class Server implements Runnable{
 
             case "call":
                 table.sendDataToAll("move#" + username + "#Call");
-                decreaseChips(table.currentBet - selfBet);
-                table.pot += table.currentBet - selfBet;
-                selfBet = table.currentBet;
+                
+                // Calculate how much more the player needs to bet
+                int amountNeeded = table.currentBet - selfBet;
+                
+                // If player doesn't have enough chips, they go all-in with what they have
+                if (amountNeeded > chips) {
+                    amountNeeded = chips;  // Bet all remaining chips
+                    isAllIn = true;  // Player is now all-in
+                }
+                
+                decreaseChips(amountNeeded);
+                table.pot += amountNeeded;
+                selfBet += amountNeeded;  // Update bet, not replace it
 
                 table.sendDataToAll("pot#" + String.valueOf(table.pot));
                 table.changeTurn();
@@ -240,14 +250,22 @@ public class Server implements Runnable{
                 break;
 
             case "raise":
-                table.sendDataToAll("move#" + username + "#Raise " + message[1]);
+                int raiseAmount = Integer.parseInt(message[1]);
+                
+                // Limit raise to available chips
+                if (raiseAmount > chips) {
+                    raiseAmount = chips;  // Can't raise more than you have
+                    isAllIn = true;  // Going all-in
+                }
+                
+                table.sendDataToAll("move#" + username + "#Raise " + raiseAmount);
                 // Only count checks from non-all-in players
                 table.checkNumber = 0;
 
-                table.currentBet = Integer.parseInt(message[1]);
-                decreaseChips(table.currentBet - selfBet);
-                table.pot += table.currentBet - selfBet;
-                selfBet = Integer.parseInt(message[1]);
+                table.currentBet = raiseAmount;
+                decreaseChips(raiseAmount - selfBet);
+                table.pot += raiseAmount - selfBet;
+                selfBet = raiseAmount;
 
                 table.sendDataToAll("pot#" + String.valueOf(table.pot));
                 table.sendDataToAll("currentbet#" + String.valueOf(table.currentBet));
