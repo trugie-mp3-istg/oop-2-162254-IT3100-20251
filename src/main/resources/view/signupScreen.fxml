@@ -22,6 +22,8 @@
       </TextField>
       <Button fx:id="signUpBtn" layoutX="542.0" layoutY="339.0" mnemonicParsing="false" onAction="#signUp" style="-fx-background-color: green; -fx-background-radius: 10;" text="Sign Up" textFill="#ffe4e4">
       </Button>
+      <Button fx:id="backBtn" layoutX="465.0" layoutY="339.0" mnemonicParsing="false" onAction="#backToLogin" style="-fx-background-color: #888888; -fx-background-radius: 10;" text="Back" textFill="#ffe4e4">
+      </Button>
       <PasswordField fx:id="password_sign" layoutX="465.0" layoutY="260.0" prefHeight="32.0" prefWidth="192.0" style="-fx-background-color: grey;">
       </PasswordField>
       <Text fill="WHITE" layoutX="375.0" layoutY="141.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CREATE ACCOUNT" underline="true" wrappingWidth="254.39599609375">
