@@ -1,5 +1,8 @@
-alex#1#3380
-james#2#16620
+alex#1#2370
+james#2#16640
 viett#1#1000
 ggg#2#0
 ttt#1#10000
+fara#1#10000
+fa#1#10000
+farra#5#10000

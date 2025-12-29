@@ -204,6 +204,9 @@ public class TableController{
     public void logout(){
 
         if(Main.client.canLogout){
+            // Phát âm thanh logout
+            AudioManager.playLogoutSound();
+            
             Main.client.out.println("logout");
             Platform.exit();
             System.exit(0);

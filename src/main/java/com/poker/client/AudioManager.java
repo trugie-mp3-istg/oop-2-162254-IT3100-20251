@@ -9,6 +9,8 @@ public class AudioManager {
     private static MediaPlayer buttonClickPlayer;
     private static MediaPlayer chipSoundPlayer;
     private static MediaPlayer roundEndPlayer;
+    private static MediaPlayer backgroundMusicPlayer;
+    private static MediaPlayer logoutSoundPlayer;
     
     /**
      * Phát âm thanh khi bấm nút
@@ -71,11 +73,71 @@ public class AudioManager {
     }
     
     /**
+     * Phát âm thanh khi logout
+     */
+    public static void playLogoutSound() {
+        try {
+            URL soundURL = AudioManager.class.getResource("/audio/button_click.mp3");
+            if (soundURL == null) {
+                System.out.println("Warning: button_click.mp3 not found");
+                return;
+            }
+            
+            Media sound = new Media(soundURL.toString());
+            logoutSoundPlayer = new MediaPlayer(sound);
+            logoutSoundPlayer.setVolume(0.3);
+            logoutSoundPlayer.play();
+        } catch (Exception e) {
+            System.err.println("Error playing logout sound: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Phát nhạc nền (loop) trên màn hình login
+     */
+    public static void playLoginBackgroundMusic() {
+        try {
+            URL musicURL = AudioManager.class.getResource("/audio/login_background.mp3");
+            if (musicURL == null) {
+                System.out.println("Warning: login_background.mp3 not found");
+                return;
+            }
+            
+            Media music = new Media(musicURL.toString());
+            backgroundMusicPlayer = new MediaPlayer(music);
+            backgroundMusicPlayer.setVolume(0.2);
+            backgroundMusicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+            backgroundMusicPlayer.play();
+        } catch (Exception e) {
+            System.err.println("Error playing background music: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Dừng nhạc nền
+     */
+    public static void stopLoginBackgroundMusic() {
+        if (backgroundMusicPlayer != null) {
+            backgroundMusicPlayer.stop();
+            backgroundMusicPlayer = null;
+        }
+    }
+    
+    /**
      * Thay đổi âm lượng nút bấm (0.0 - 1.0)
      */
     public static void setButtonSoundVolume(double volume) {
         if (buttonClickPlayer != null) {
             buttonClickPlayer.setVolume(Math.max(0, Math.min(1, volume)));
+        }
+    }
+    
+    /**
+     * Thay đổi âm lượng nhạc nền (0.0 - 1.0)
+     */
+    public static void setBackgroundMusicVolume(double volume) {
+        if (backgroundMusicPlayer != null) {
+            backgroundMusicPlayer.setVolume(Math.max(0, Math.min(1, volume)));
         }
     }
 }
