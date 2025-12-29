@@ -26,6 +26,8 @@ public class Server implements Runnable{
     public int selfBet;
     public int tableID;
 
+    public int playerIndex = -1; // Chỉ số vị trí trong bàn ( 0 = leader, 1, 2, 3, 4)
+
     private static List<Server> loggedInUsers;
     public static List<Server> waitingUsers;
     private static Table table1;
@@ -246,100 +248,208 @@ public class Server implements Runnable{
                 break;
 
             case "logout":
+                System.out.println("[Logout start] " + username + " is logging out...");
+                System.out.println("[Before logout] Table " + getTableNumber(table) + ": " 
+                    + table.players.size() + " players, isStarted: " + table.isStarted);
+                
                 updateChips();
                 // Reset login status to allow re-login
                 isLoggedIn = false;
                 table.sendDataToAll("logout#" + username);
 
-                if(isTurn){
-                    isTurn = false;
-                    table.changeTurn();
-                    table.inGamePlayers.remove(this);
-                    table.players.remove(this);
-                    loggedInUsers.remove(this);
-                    table.whichPlayerTurn--;
+                boolean wasLeader = (this.playerIndex == 0);
+                boolean gameStarted = table.isStarted;
+                Table affectedTable = table;
 
-                    if(table.checkNumber == table.inGamePlayers.size())
-                        table.changeRound();
+                // BƯỚC 1: Xóa người logout khỏi bàn
+                table.inGamePlayers.remove(this);
+                table.players.remove(this);
+                loggedInUsers.remove(this);
+                
+                System.out.println("[After Remove] Table " + getTableNumber(affectedTable) + ": " 
+                    + affectedTable.players.size() + " players remaining");
 
-                    if(table.inGamePlayers.size() == 1){
-                        table.Reset();
-                    }
+                // BƯỚC 2: Cập nhật playerIndex cho những người còn lại
+                if(affectedTable.players.size() > 0) {
+                    updatePlayerIndices(affectedTable);
                 }
-
-                else {
-                    if(!isFolded){
-                        table.inGamePlayers.remove(this);
-                        table.players.remove(this);
-                        loggedInUsers.remove(this);
-
-                        table.whichPlayerTurn--;
-                        if(table.inGamePlayers.size() == 1){
-                            table.Reset();
+                
+                // BƯỚC 3: KIỂM TRA SỐ NGƯỜI CÒN LẠI
+                if(affectedTable.players.size() == 0) {
+                    // ➜ Bàn trống hoàn toàn → reset để người mới vào
+                    System.out.println("[Table empty] No players left. Resetting table for new players.");
+                    resetTableForNewGame(affectedTable);
+                }
+                else if(affectedTable.players.size() == 1) {
+                    // ➜ Chỉ còn 1 người
+                    Server lastPlayer = affectedTable.players.get(0);
+                    
+                    if(gameStarted) {
+                        // Game đang diễn ra → người đó thắng (MUCK) → RESET
+                        System.out.println("[One player left] Game was started. " + lastPlayer.username + " wins!");
+                        lastPlayer.chips += affectedTable.pot;
+                        affectedTable.sendDataToAll("winner#\" MUCK! " + lastPlayer.username + " won! Pot: " 
+                            + affectedTable.pot + " \"");
+                        affectedTable.sendDataToAll("chips#" + lastPlayer.username + "#" + lastPlayer.chips);
+                        affectedTable.sendDataToAll("pot#0");
+                        
+                        // QUAN TRỌNG: Reset để bàn trở về trạng thái ban đầu
+                        // Nếu không reset, người mới vào sẽ thành leader mới thay vì lastPlayer
+                        System.out.println("[Reset after game] Resetting table so " + lastPlayer.username 
+                            + " remains as leader for next game");
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            System.err.println("[ERROR] Sleep interrupted");
                         }
-                    }
-                    else {
-                        table.players.remove(this);
-                        loggedInUsers.remove(this);
+                        resetTableForNewGameKeepLeader(affectedTable, lastPlayer);
+                    } else {
+                        // Game chưa start → ĐỨ LẠI, KHÔNG RESET
+                        System.out.println("[One player left] Game NOT started. Waiting for more players...");
+                        lastPlayer.out.println("message# Chỉ còn bạn (Leader). Chờ người chơi khác vào...");
+                        lastPlayer.out.println("message# Startgame sẽ sáng lại khi có người mới vào bàn");
+                        
+                        // QUAN TRỌNG: KHÔNG RESET → người mới vào sẽ join vào bàn này
+                        System.out.println("[No reset] Waiting for new players to join Table " + getTableNumber(affectedTable));
                     }
                 }
+                else {
+                    // ➜ Còn 2+ người → tiếp tục chơi
+                    System.out.println("[Multiple players left] " + affectedTable.players.size() + " players remaining.");
+                    
+                    if(wasLeader) {
+                        // Leader logout → gán leader mới (người đầu tiên trong list)
+                        System.out.println("[Leader changed] Old leader logged out. New leader assigned.");
+                        notifyNewLeader(affectedTable);
+                    }
+                    
+                    // Nếu game đang diễn ra, xử lý lượt chơi
+                    if(gameStarted) {
+                        System.out.println("[Game ongoing] Adjusting turn...");
+                        affectedTable.whichPlayerTurn--;
+                        if(affectedTable.whichPlayerTurn < 0) {
+                            affectedTable.whichPlayerTurn = affectedTable.inGamePlayers.size() - 1;
+                        }
+                        if(affectedTable.checkNumber == affectedTable.inGamePlayers.size())
+                            affectedTable.changeRound();
+                    }
+                }
+                
+                System.out.println("[Logout end] " + username + " logged out. Table " 
+                    + getTableNumber(affectedTable) + ": " + affectedTable.players.size() + " players, isStarted: " 
+                    + affectedTable.isStarted);
                 break;
 
             case "logoutwait":
+                System.out.println("[Logout wait] " + username + " leaves waiting room");
                 isLoggedIn = false;
                 loggedInUsers.remove(this);
                 waitingUsers.remove(this);
+                break;
+            
+            case "startgame": // Thêm start
+                if (table != null && !table.isStarted) {
+                    if(this.playerIndex != 0) {
+                        out.println("message#Only the table leader can start the game!");
+                        System.out.println("[Error] " + username + " tried to start game but is not the leader!");
+                        break;
+                    }
+
+                    if (table.players.size() >= 2) { // Tối thiểu 2 người
+                        table.startGame();
+                        table.isStarted = true;
+                        System.out.println("Game started by " + username + " (Leader)");
+                        table.sendDataToAll("message#Game started!");
+                    } else {
+                        out.println("message#At least 2 player to start.");
+                    }
+                } else {
+                    out.println("message#Game has been started or error!");
+                }
                 break;
         }
     }
 
     private void updateChips(){
-        File originalFile = new File("data.txt"); // original file
-        FileReader fin = null;
-        try {
-            fin = new FileReader(originalFile);
-        } catch (FileNotFoundException e) {
-            System.err.println("couldn't find file");
-        }
-        Scanner in = new Scanner(fin);
-
-        File tempFile = new File("tempdata.txt"); // temporary file
-        PrintWriter pw = null;
-
-        try {
-            pw = new PrintWriter(new FileWriter(tempFile),true);
-        } catch (IOException e) {
-            System.err.println("IO error in temp file");
-        }
-
-        String line;
-        String [] entry;
-
-        while(true){
-            entry = in.nextLine().split("#");
-
-            if(entry[0].equals(username)){
-                entry[2]=String.valueOf(chips);
-            }
-
-            line = entry[0]+ "#"+ entry[1]+ "#"+ entry[2];
-            System.out.println(line);
-
-            pw.println(line);
-
-            if(!in.hasNextLine()) break;
-        }
-
-        in.close();
-        pw.close();
-
-        if (!originalFile.delete()) {
-            System.out.println("Could not delete file");
+        File originalFile = new File("data.txt");
+        
+        if(!originalFile.exists()) {
+            System.err.println("[ERROR] data.txt not found!");
             return;
         }
+        
+        FileReader fin = null;
+        Scanner in = null;
+        PrintWriter pw = null;
+        
+        try {
+            fin = new FileReader(originalFile);
+            in = new Scanner(fin);
+            
+            File tempFile = new File("tempdata.txt");
+            pw = new PrintWriter(new FileWriter(tempFile), true);
 
-        if (!tempFile.renameTo(originalFile))
-            System.out.println("Could not rename file");
+            String line;
+            String[] entry;
+
+            while(in.hasNextLine()){
+                line = in.nextLine().trim();
+                
+                if(line.isEmpty()) continue;
+                
+                entry = line.split("#");
+                
+                if(entry.length != 3) {
+                    pw.println(line);
+                    continue;
+                }
+                
+                int storedChips = 0;
+                try {
+                    storedChips = Integer.parseInt(entry[2].trim());
+                    if(storedChips < 0) storedChips = 0;
+                } catch (NumberFormatException e) {
+                    System.err.println("[ERROR] Invalid chips: " + entry[2]);
+                    storedChips = 1000;
+                }
+                
+                if(entry[0].trim().equals(username)){
+                    storedChips = chips;
+                    System.out.println("[Chips Updated] " + username + " → " + chips + " chips");
+                }
+                
+                line = entry[0].trim() + "#" + entry[1].trim() + "#" + storedChips;
+                pw.println(line);
+            }
+
+            in.close();
+            pw.close();
+            fin.close();
+
+            if (!originalFile.delete()) {
+                System.err.println("[ERROR] Could not delete original file");
+                return;
+            }
+
+            if (!tempFile.renameTo(originalFile)) {
+                System.err.println("[ERROR] Could not rename temp file");
+            } else {
+                System.out.println("[SUCCESS] data.txt updated!");
+            }
+            
+        } catch (FileNotFoundException e) {
+            System.err.println("[ERROR] File not found: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("[ERROR] IO Exception: " + e.getMessage());
+        } finally {
+            try {
+                if(in != null) in.close();
+                if(fin != null) fin.close();
+                if(pw != null) pw.close();
+            } catch (IOException e) {
+                System.err.println("[ERROR] Error closing resources: " + e.getMessage());
+            }
+        }
     }
 
     private boolean validateLogIn(String username, String password) {
@@ -418,30 +528,92 @@ public class Server implements Runnable{
         this.username = username;
         loggedInUsers.add(this);
         out.println("login done#"+username+"#"+String.valueOf(chips));
+        
 
-        if(!table1.isStarted){
+        // Kiểm tra Table 1 có chỗ trống không
+        if(!table1.isStarted && table1.players.size() < 5){
             table = table1;
-            table.players.add(this);
-
-            if(table.players.size()==2){
-                table.startGame();
-                table.isStarted = true;
+            
+            // ← BƯỚC 1: Gửi opponentAdded cho NGƯỜI MỚI
+            // Để họ thấy những người ĐANG CÓ trong bàn
+            System.out.println("[Send opponents to new player] " + username);
+            for(Server existingPlayer : table.players) {
+                System.out.println("  → Sending opponent: " + existingPlayer.username);
+                out.println("opponentAdded#" + existingPlayer.username + "#" + existingPlayer.chips);
             }
-
+            
+            // ← BƯỚC 2: THÊM người mới vào bàn
+            this.playerIndex = table.players.size();
+            table.players.add(this);
+            System.out.println("[Table 1] " + username + " joins! (" + table.players.size() + "/5) - Index: " + playerIndex);
+            
+            // ← BƯỚC 3: Gửi opponentAdded cho NHỮNG NGƯỜI CÓ TRONG BÀN
+            // Để họ thấy NGƯỜI MỚI VỪA VÀO
+            System.out.println("[Send new player to others] " + username);
+            for(Server existingPlayer : table.players) {
+                // ← QUAN TRỌNG: Không gửi cho chính người vừa join!
+                if(!existingPlayer.username.equals(username)) {
+                    System.out.println("  → Sending to: " + existingPlayer.username);
+                    existingPlayer.out.println("opponentAdded#" + username + "#" + chips);
+                }
+            }
+            
+            // Gửi message cho TẤT CẢ
+            table.sendDataToAll("message#" + username + " joins Table 1! (" + table.players.size() + "/5)");
+            
+            // Xác định leader
+            if(this.playerIndex == 0) {
+                out.println("isleader#true");
+                System.out.println("[Table 1] " + username + " is the TABLE LEADER (Index 0)");
+            }
+            else {
+                out.println("isleader#false");
+                System.out.println("[Table 1] " + username + " is NOT the leader (Index " + playerIndex + ")");
+            }
         }
-
-       else if(!table2.isStarted){
+        // Nếu Table 1 đã đầy hoặc đã bắt đầu, kiểm tra Table 2
+        else if(!table2.isStarted && table2.players.size() < 5){
             table = table2;
+            
+            // ← BƯỚC 1: Gửi opponentAdded cho NGƯỜI MỚI
+            System.out.println("[Send Opponents to New Player] " + username);
+            for(Server existingPlayer : table.players) {
+                System.out.println("  → Sending opponent: " + existingPlayer.username);
+                out.println("opponentAdded#" + existingPlayer.username + "#" + existingPlayer.chips);
+            }
+            
+            // ← BƯỚC 2: THÊM người mới vào bàn
+            this.playerIndex = table.players.size();
             table.players.add(this);
-
-            if(table.players.size()==2){
-                table.startGame();
-                table.isStarted = true;
+            System.out.println("[Table 2] " + username + " joins! (" + table.players.size() + "/5) - Index: " + playerIndex);
+            
+            // ← BƯỚC 3: Gửi opponentAdded cho NHỮNG NGƯỜI CÓ TRONG BÀN
+            System.out.println("[Send New Player to Others] " + username);
+            for(Server existingPlayer : table.players) {
+                if(!existingPlayer.username.equals(username)) {
+                    System.out.println("  → Sending to: " + existingPlayer.username);
+                    existingPlayer.out.println("opponentAdded#" + username + "#" + chips);
+                }
+            }
+            
+            // Gửi message cho TẤT CẢ
+            table.sendDataToAll("message#" + username + " joins Table 2! (" + table.players.size() + "/5)");
+            
+            // Xác định leader
+            if(this.playerIndex == 0) {
+                out.println("isleader#true");
+                System.out.println("[Table 2] " + username + " is the TABLE LEADER (Index 0)");
+            }
+            else {
+                out.println("isleader#false");
+                System.out.println("[Table 2] " + username + " is NOT the leader (Index " + playerIndex + ")");
             }
         }
+            // Cả 2 bàn đầy hoặc đã bắt đầu, vào waiting room
         else {
             out.println("wait");
             waitingUsers.add(this);
+            System.out.println("[Waiting room] " + username + " joins waiting room. Total waiting: " + waitingUsers.size());
         }
     }
 
@@ -459,6 +631,128 @@ public class Server implements Runnable{
         }
     }
 
+    private void updatePlayerIndices(Table table) {
+        if(table.players.size() == 0) {
+            System.out.println("[Update indices] Table is empty!");
+            return;
+        }
+        
+        System.out.println("[Update indices] Reassigning indices for " + table.players.size() + " players");
+        
+        for(int i = 0; i < table.players.size(); i++) {
+            Server player = table.players.get(i);
+            int oldIndex = player.playerIndex;
+            player.playerIndex = i;
+            
+            System.out.println("[Index change] " + player.username + ": " + oldIndex + " → " + i);
+            
+            // Nếu trở thành index 0 (leader mới)
+            if(i == 0 && oldIndex != 0) {
+                System.out.println("[New leader] " + player.username + " is now leader! (Index 0)");
+                if(!table.isStarted) {
+                    player.out.println("isleader#true");
+                    player.out.println("message# You are Table Leader! Click 'Start game' when ready");
+                }
+            }
+            // Những người khác không phải leader
+            else if(i != 0 && oldIndex == 0) {
+                System.out.println("[Lost Leader] " + player.username + " is no longer leader");
+                player.out.println("isleader#false");
+            }
+        }
+    }
 
+    private void notifyNewLeader(Table table) {
+        if(table.players.size() == 0) {
+            System.out.println("[No leader] Table is empty!");
+            return;
+        }
+        
+        if(table.isStarted) {
+            System.out.println("[Leader not changed] Game already started, no leader change!");
+            return;
+        }
+        
+        Server newLeader = table.players.get(0);
+        System.out.println("[New Leader Notification] " + newLeader.username 
+            + " (Index 0) is now the TABLE LEADER!");
+        
+        // Gửi cho leader mới
+        newLeader.out.println("isleader#true");
+        newLeader.out.println("message# You are Table Leader! You can start the game");
+        
+        // Gửi cho những người khác
+        for(int i = 1; i < table.players.size(); i++) {
+            Server player = table.players.get(i);
+            player.out.println("isleader#false");
+            player.out.println("message# " + newLeader.username + " is leader. Wait for starting...");
+        }
+        
+        // Gửi thông báo chung
+        table.sendDataToAll("message# New Leader: " + newLeader.username);
+        
+        System.out.println("[Leader notification sent]");
+    }
+
+    private void resetTableForNewGame(Table table) {
+        System.out.println("[Reset table start] Resetting table " + getTableNumber(table) + "...");
+        
+        // Xóa tất cả player
+        table.players.clear();
+        table.inGamePlayers.clear();
+        
+        // Set isStarted = FALSE
+        table.isStarted = false;
+        
+        // Reset game state
+        table.pot = 0;
+        table.currentBet = 0;
+        table.checkNumber = 0;
+        table.whichPlayerTurn = 0;
+        
+        // Gửi cardReset để client clear UI
+        table.sendDataToAll("cardReset");
+        
+        System.out.println("[Reset table end] Table " + getTableNumber(table) 
+            + " is ready for new players! (isStarted = false)");
+    }
+
+    private void resetTableForNewGameKeepLeader(Table table, Server leader) {
+        System.out.println("[Reset table keep leader] Resetting table " + getTableNumber(table) 
+            + " with " + leader.username + " as leader...");
+        
+        // XÓA tất cả player
+        table.players.clear();
+        table.inGamePlayers.clear();
+        
+        // THÊM LẠI leader với index 0
+        table.players.add(leader);
+        leader.playerIndex = 0;
+        
+        // Set isStarted = FALSE
+        table.isStarted = false;
+        
+        // Reset game state
+        table.pot = 0;
+        table.currentBet = 0;
+        table.checkNumber = 0;
+        table.whichPlayerTurn = 0;
+        
+        // Gửi cardReset để client clear UI
+        table.sendDataToAll("cardReset");
+        
+        // Thông báo
+        leader.out.println("isleader#true");
+        leader.out.println("message# You are Table Leader! You can start the game now. Wait for others to join...");
+        
+        System.out.println("[Reset table end] Table " + getTableNumber(table) 
+            + " ready! " + leader.username + " is still the LEADER (isStarted = false)");
+    }
+
+    private int getTableNumber(Table table) {
+        if(table == Server.table1) return 1;
+        if(table == Server.table2) return 2;
+        return -1;
+    }
 }
 

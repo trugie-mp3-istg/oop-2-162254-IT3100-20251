@@ -100,36 +100,61 @@ public class Client{
                 break;
 
             case "opponentAdded":
-                players.add(new Player(message[1],Integer.parseInt(message[2])));
-
-                if(players.size()==2) {
-
-                    tc.p2.setText(message[1]);
-                    tc.c2.setText(String.valueOf(message[2]));
-                    tc.circle2.setVisible(true);
-                    tc.circle2.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
-                    tc.avatar2.setFill(new ImagePattern(new Image("/graphic/face3.jpg")));
+                String opponentName = message[1];
+                int opponentChips = Integer.parseInt(message[2]);
+                
+                // ← KIỂM TRA: Opponent này đã có trong danh sách chưa?
+                boolean alreadyExists = false;
+                for(Player p : players) {
+                    if(p.username.equals(opponentName)) {
+                        alreadyExists = true;
+                        System.out.println("[Client] Opponent " + opponentName + " already in list. Skip!");
+                        break;
+                    }
                 }
-                else if(players.size()==3){
-                    tc.p3.setText(message[1]);
-                    tc.c3.setText(String.valueOf(message[2]));
-                    tc.circle3.setVisible(true);
-                    tc.circle3.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
-                    tc.avatar3.setFill(new ImagePattern(new Image("/graphic/face5.png")));
-                }
-                else if(players.size()==4){
-                    tc.p4.setText(message[1]);
-                    tc.c4.setText(String.valueOf(message[2]));
-                    tc.circle4.setVisible(true);
-                    tc.circle4.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
-                    tc.avatar4.setFill(new ImagePattern(new Image("/graphic/face4.jpg")));
-                }
-                else if(players.size()==5){
-                    tc.p5.setText(message[1]);
-                    tc.c5.setText(String.valueOf(message[2]));
-                    tc.circle5.setVisible(true);
-                    tc.circle5.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
-                    tc.avatar5.setFill(new ImagePattern(new Image("/graphic/face6.png")));
+                
+                // ← NẾU chưa có: Thêm vào
+                if(!alreadyExists) {
+                    players.add(new Player(opponentName, opponentChips));
+                    System.out.println("[Client] Added opponent: " + opponentName + " (Total: " + players.size() + ")");
+                    
+                    // ← HIỂN THỊ dựa trên số lượng opponent
+                    // players.size() = 1 (chỉ mình) → không hiển thị gì
+                    // players.size() = 2 (mình + 1 người) → hiển thị position 2
+                    // players.size() = 3 (mình + 2 người) → hiển thị position 3
+                    
+                    if(players.size() == 2) {
+                        tc.p2.setText(opponentName);
+                        tc.c2.setText(String.valueOf(opponentChips));
+                        tc.circle2.setVisible(true);
+                        tc.circle2.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
+                        tc.avatar2.setFill(new ImagePattern(new Image("/graphic/face3.jpg")));
+                        System.out.println("[Display] Showing opponent at position 2: " + opponentName);
+                    }
+                    else if(players.size() == 3) {
+                        tc.p3.setText(opponentName);
+                        tc.c3.setText(String.valueOf(opponentChips));
+                        tc.circle3.setVisible(true);
+                        tc.circle3.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
+                        tc.avatar3.setFill(new ImagePattern(new Image("/graphic/face5.png")));
+                        System.out.println("[Display] Showing opponent at position 3: " + opponentName);
+                    }
+                    else if(players.size() == 4) {
+                        tc.p4.setText(opponentName);
+                        tc.c4.setText(String.valueOf(opponentChips));
+                        tc.circle4.setVisible(true);
+                        tc.circle4.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
+                        tc.avatar4.setFill(new ImagePattern(new Image("/graphic/face4.jpg")));
+                        System.out.println("[Display] Showing opponent at position 4: " + opponentName);
+                    }
+                    else if(players.size() == 5) {
+                        tc.p5.setText(opponentName);
+                        tc.c5.setText(String.valueOf(opponentChips));
+                        tc.circle5.setVisible(true);
+                        tc.circle5.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
+                        tc.avatar5.setFill(new ImagePattern(new Image("/graphic/face6.png")));
+                        System.out.println("[Display] Showing opponent at position 5: " + opponentName);
+                    }
                 }
                 break;
 
@@ -332,6 +357,21 @@ public class Client{
 
             case "alive":
                 canLogout=true;
+                break;
+            
+            case "message": // Thêm case
+                tc.message.setText(message[1]);
+                break;
+            
+            case "isleader":
+                boolean isLeader = message[1].equals("true");
+                tc.setTableLeader(isLeader);
+
+                if(isLeader) {
+                    System.out.println("[Client] You are the TABLE LEADER!");
+                } else {
+                    System.out.println("[Client] You are NOT the leader");
+                }
                 break;
         }
     }
