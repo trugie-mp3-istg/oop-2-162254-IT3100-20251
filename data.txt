@@ -1,3 +1,14 @@
+<<<<<<< HEAD
 admin#123#10000
 player1#pass#10000
 player2#pass#10000
+=======
+alex#1#2370
+james#2#16640
+viett#1#1000
+ggg#2#0
+ttt#1#10000
+fara#1#10000
+fa#1#10000
+farra#5#10000
+>>>>>>> d5adb78c8f70c6ec1a93330d1cd0b529c4b4f0a8

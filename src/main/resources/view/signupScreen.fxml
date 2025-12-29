@@ -20,7 +20,7 @@
       </Label>
       <TextField fx:id="userName_sign" layoutX="465.0" layoutY="201.0">
       </TextField>
-      <Button layoutX="542.0" layoutY="339.0" mnemonicParsing="false" onAction="#signUp" style="-fx-background-color: green; -fx-background-radius: 10;" text="Sign Up" textFill="#ffe4e4">
+      <Button fx:id="signUpBtn" layoutX="542.0" layoutY="339.0" mnemonicParsing="false" onAction="#signUp" style="-fx-background-color: green; -fx-background-radius: 10;" text="Sign Up" textFill="#ffe4e4">
       </Button>
       <PasswordField fx:id="password_sign" layoutX="465.0" layoutY="260.0" prefHeight="32.0" prefWidth="192.0" style="-fx-background-color: grey;">
       </PasswordField>

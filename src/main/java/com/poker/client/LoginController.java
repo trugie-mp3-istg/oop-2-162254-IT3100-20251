@@ -23,11 +23,16 @@ public class LoginController{
         // Thêm hiệu ứng cho các nút
         if (loginBtn != null) ButtonEffects.addAllEffects(loginBtn);
         if (createAccountBtn != null) ButtonEffects.addAllEffects(createAccountBtn);
+        
+        // Phát nhạc nền trên màn hình login
+        AudioManager.playLoginBackgroundMusic();
     }
 
     public void logIn() {
-        if (userName_log.getText() != null && password_log.getText() != null) {
-
+        if (!userName_log.getText().trim().isEmpty() && !password_log.getText().trim().isEmpty()) {
+            // Dừng nhạc nền trước khi login
+            AudioManager.stopLoginBackgroundMusic();
+            
            Main.client.out.println("login#"+userName_log.getText()+"#"+password_log.getText());
         }
     }

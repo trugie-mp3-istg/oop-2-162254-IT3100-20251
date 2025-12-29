@@ -553,13 +553,8 @@ public class Server implements Runnable{
 
     private void initiateUserEntry(String username){
         // Kiểm tra xem username này đã đăng nhập chưa
-        for (Server user : loggedInUsers) {
-            if (user.username.equals(username)) {
-                out.println("decline"); // từ chối đăng nhập
-                isLoggedIn = false;
-                return;
-            }
-        }
+        // Nếu có, hãy loại bỏ entry cũ (có thể là từ kết nối trước đó)
+        loggedInUsers.removeIf(user -> user.username != null && user.username.equals(username));
         
         isLoggedIn = true;
         this.username = username;

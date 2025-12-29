@@ -20,9 +20,9 @@
       </Label>
       <TextField fx:id="userName_log" layoutX="54.0" layoutY="410.0" style="-fx-background-color: grey;">
       </TextField>
-      <Button layoutX="183.0" layoutY="548.0" mnemonicParsing="false" onAction="#logIn" prefHeight="44.0" prefWidth="123.0" style="-fx-background-color: #003366; -fx-background-radius: 15;" text="Log In" textFill="WHITE">
+      <Button fx:id="loginBtn" layoutX="183.0" layoutY="548.0" mnemonicParsing="false" onAction="#logIn" prefHeight="44.0" prefWidth="123.0" style="-fx-background-color: #003366; -fx-background-radius: 15;" text="Log In" textFill="WHITE">
       </Button>
-      <Button layoutX="750.0" layoutY="31.0" mnemonicParsing="false" onAction="#createAccount" prefHeight="53.0" prefWidth="198.0" style="-fx-background-color: #191970; -fx-background-radius: 15;" text="Create Account" textFill="WHITE">
+      <Button fx:id="createAccountBtn" layoutX="750.0" layoutY="31.0" mnemonicParsing="false" onAction="#createAccount" prefHeight="53.0" prefWidth="198.0" style="-fx-background-color: #191970; -fx-background-radius: 15;" text="Create Account" textFill="WHITE">
       </Button>
       <PasswordField fx:id="password_log" layoutX="57.0" layoutY="496.0" />
    </children>
