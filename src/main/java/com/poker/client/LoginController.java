@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -14,6 +15,15 @@ public class LoginController{
 
     @FXML private TextField userName_log;
     @FXML private PasswordField password_log;
+    @FXML private Button loginBtn;
+    @FXML private Button createAccountBtn;
+
+    @FXML
+    public void initialize() {
+        // Thêm hiệu ứng cho các nút
+        if (loginBtn != null) ButtonEffects.addAllEffects(loginBtn);
+        if (createAccountBtn != null) ButtonEffects.addAllEffects(createAccountBtn);
+    }
 
     public void logIn() {
         if (userName_log.getText() != null && password_log.getText() != null) {

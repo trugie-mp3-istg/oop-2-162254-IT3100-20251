@@ -226,6 +226,7 @@ public class Client{
 
             case "winner":
                 tc.action.setText(message[1]);
+                AudioManager.playRoundEndSound();
                 break;
 
             case "round":
@@ -398,7 +399,7 @@ public class Client{
 
             Main.stage.close();
             Main.stage.setTitle("WAITING ROOM");
-            Main.stage.setScene(new Scene(root));
+            Main.stage.setScene(new Scene(root, 600, 400));
             Main.stage.show();
         }
         catch (IOException e){

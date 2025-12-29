@@ -71,7 +71,25 @@ public class TableController{
     @FXML public Text action4;
     @FXML public Text action5;
 
-    @FXML private Button startGameBtn; // Thêm
+    @FXML private Button startGameBtn;
+    @FXML private Button checkBtn;
+    @FXML private Button foldBtn;
+    @FXML private Button raiseBtn;
+    @FXML private Button callBtn;
+    @FXML private Button logoutTableBtn;
+    @FXML private Button allInBtn;
+
+    @FXML
+    public void initialize() {
+        // Thêm hiệu ứng cho tất cả các nút
+        if (startGameBtn != null) ButtonEffects.addAllEffects(startGameBtn);
+        if (checkBtn != null) ButtonEffects.addAllEffects(checkBtn);
+        if (foldBtn != null) ButtonEffects.addAllEffects(foldBtn);
+        if (raiseBtn != null) ButtonEffects.addAllEffects(raiseBtn);
+        if (callBtn != null) ButtonEffects.addAllEffects(callBtn);
+        if (logoutTableBtn != null) ButtonEffects.addAllEffects(logoutTableBtn);
+        if (allInBtn != null) ButtonEffects.addAllEffects(allInBtn);
+    }
 
     public List<Server> players = new ArrayList<>();
     public Server leader = null;
@@ -86,6 +104,7 @@ public class TableController{
               if(Main.client.currentbet - Main.client.selfBet<= Main.client.chips){
                   if(Main.client.currentbet != Main.client.selfBet){
 
+                      AudioManager.playChipSound();
                       Main.client.out.println("call");
                       Main.client.selfBet = Main.client.currentbet;
                       Main.client.isTurn = false;
@@ -129,6 +148,7 @@ public class TableController{
 
                     if(Integer.parseInt(raisebox.getText()) > Main.client.currentbet){
 
+                        AudioManager.playChipSound();
                         Main.client.out.println("raise#" + raisebox.getText());
                         Main.client.selfBet = Integer.parseInt(raisebox.getText());
                         raisebox.clear();
@@ -167,6 +187,7 @@ public class TableController{
 
         if(Main.client.isTurn){
             if(Main.client.chips > 0){
+                AudioManager.playChipSound();
                 Main.client.out.println("allin");
                 Main.client.isTurn = false;
             }
