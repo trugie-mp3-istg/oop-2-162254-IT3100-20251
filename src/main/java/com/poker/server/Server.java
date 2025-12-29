@@ -187,23 +187,27 @@ public class Server implements Runnable{
         switch (message[0]){
 
             case "login":
-                if(isLoggedIn)
+                if(isLoggedIn) {
+                    out.println("decline#already_logged_in");
                     break;
+                }
 
                 if(validateLogIn(message[1],message[2])){
                     initiateUserEntry(message[1]);
                 }
-                else out.println("decline"); // invalid message
+                else out.println("decline#invalid_credentials"); // invalid username or password
                 break;
 
             case "signup":
-                if(isLoggedIn)
+                if(isLoggedIn) {
+                    out.println("decline#already_logged_in");
                     break;
+                }
 
                 if(validateSignUp(message[1],message[2])){
                     initiateUserEntry(message[1]);
                 }
-                else out.println("decline"); // invalid message
+                else out.println("decline#username_exists"); // username already exists
                 break;
 
             case "call":

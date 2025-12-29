@@ -96,7 +96,15 @@ public class Client{
                 break;
 
             case "decline":
-                lc.showErrorMessage("Account is already logged in!");
+                if(message.length > 1 && message[1].equals("already_logged_in")) {
+                    lc.showErrorMessage("This account is already logged in!");
+                } else if(message.length > 1 && message[1].equals("invalid_credentials")) {
+                    lc.showErrorMessage("Invalid username or password!");
+                } else if(message.length > 1 && message[1].equals("username_exists")) {
+                    lc.showErrorMessage("Username already exists! Please choose another.");
+                } else {
+                    lc.showErrorMessage("Login failed!");
+                }
                 break;
 
             case "wait":
