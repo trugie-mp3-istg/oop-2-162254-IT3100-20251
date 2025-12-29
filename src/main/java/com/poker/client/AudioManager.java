@@ -97,6 +97,9 @@ public class AudioManager {
      */
     public static void playLoginBackgroundMusic() {
         try {
+            // Dừng nhạc cũ trước khi phát nhạc mới (tránh phát 2 lần)
+            stopLoginBackgroundMusic();
+            
             URL musicURL = AudioManager.class.getResource("/audio/login_background.mp3");
             if (musicURL == null) {
                 System.out.println("Warning: login_background.mp3 not found");
