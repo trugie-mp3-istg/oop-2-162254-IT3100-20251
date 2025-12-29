@@ -85,7 +85,7 @@ public class Client{
                 chips = Integer.parseInt(message[2]);
 
                 players = new ArrayList<>();
-                players.add(new Player(username,chips));
+                players.add(new BasePlayer(username,chips));
 
                 openTable();
                 tc.message.setText("Waiting for players...");
@@ -100,7 +100,7 @@ public class Client{
                 break;
 
             case "opponentAdded":
-                players.add(new Player(message[1],Integer.parseInt(message[2])));
+                players.add(new BasePlayer(message[1],Integer.parseInt(message[2])));
 
                 if(players.size()==2) {
 
@@ -142,7 +142,7 @@ public class Client{
             case "chips":
                 for(int i=0; i<players.size(); i++){
 
-                    if(message[1].equals(players.get(i).username)){
+                    if(message[1].equals(players.get(i).getUsername())){
 
                         if(i==0){
                             tc.c1.setText(message[2]);
@@ -186,7 +186,7 @@ public class Client{
 
             case "whichPturn":
                 for(Player player: players){
-                    if(message[1].equals(player.username)){
+                    if(message[1].equals(player.getUsername())){
                         if(message[1].equals(username)){
                             isTurn = true;
                         }
@@ -254,7 +254,7 @@ public class Client{
                 tc.action.setText(" ");
 
                 players = new ArrayList<>();
-                players.add(new Player(username,chips));
+                players.add(new BasePlayer(username,chips));
                 break;
 
             case "cardshow":
@@ -291,7 +291,7 @@ public class Client{
 
             case "logout":
                 for(int i=0; i<players.size(); i++){
-                    if(players.get(i).username.equals(message[1])){
+                    if(players.get(i).getUsername().equals(message[1])){
                         players.remove(i);
                         break;
                     }
