@@ -144,8 +144,21 @@ public class Server implements Runnable {
             case "login":
               
                 if (isLoggedIn) { out.println("decline#already_logged_in"); break; }
-                if (validateLogIn(message[1], message[2])) initiateUserEntry(message[1]);
-                else out.println("decline#invalid_credentials");
+                
+                // Kiểm tra credentials trước
+                if (!validateLogIn(message[1], message[2])) {
+                    out.println("decline#invalid_credentials");
+                    break;
+                }
+                
+                // Sau đó kiểm tra dupe login
+                if (isUserAlreadyLoggedIn(message[1])) { 
+                    out.println("decline#already_logged_in"); 
+                    break; 
+                }
+                
+                // Nếu credentials đúng và chưa logged in, thi cho login
+                initiateUserEntry(message[1]);
                 break;
 
             case "signup":
@@ -315,25 +328,47 @@ public class Server implements Runnable {
             tempFile.renameTo(originalFile);
         } catch (Exception e) {}
     }
-    private boolean validateLogIn(String u, String p) { /* Giữ nguyên */ 
+    private boolean validateLogIn(String u, String p) {
          try {
             Scanner in = new Scanner(new FileReader("data.txt"));
             while (in.hasNextLine()) {
-                String[] entry = in.nextLine().split("#");
-                if (entry[0].equals(u) && entry[1].equals(p)) {
-                    this.chips = Integer.parseInt(entry[2]);
-                    in.close(); return true;
+                String line = in.nextLine().trim();
+                if (line.isEmpty()) continue;
+                String[] entry = line.split("#");
+                if (entry.length < 3) continue;
+                String username = entry[0].trim();
+                String password = entry[1].trim();
+                String chipsStr = entry[2].trim();
+                if (username.equals(u) && password.equals(p)) {
+                    try {
+                        this.chips = Integer.parseInt(chipsStr);
+                    } catch (NumberFormatException e) {
+                        this.chips = 10000;
+                    }
+                    in.close();
+                    return true;
                 }
             }
             in.close();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
-    private boolean validateSignUp(String u, String p) { /* Giữ nguyên */ 
+
+    private boolean validateSignUp(String u, String p) {
         try {
             Scanner in = new Scanner(new FileReader("data.txt"));
             while (in.hasNextLine()) {
-                if (in.nextLine().split("#")[0].equals(u)) { in.close(); return false; }
+                String line = in.nextLine().trim();
+                if (line.isEmpty()) continue;
+                String[] entry = line.split("#");
+                if (entry.length < 1) continue;
+                String username = entry[0].trim();
+                if (username.equals(u)) { 
+                    in.close(); 
+                    return false; // Username already exists
+                }
             }
             in.close();
             FileWriter fout = new FileWriter("data.txt", true);
@@ -341,12 +376,23 @@ public class Server implements Runnable {
             this.chips = 10000;
             fout.close();
             return true;
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
-    private void initiateUserEntry(String u) { /* Giữ nguyên */ 
+
+    private boolean isUserAlreadyLoggedIn(String username) {
+        for (Server user : loggedInUsers) {
+            if (user.username != null && user.username.equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void initiateUserEntry(String u) {
         // Logic add table, gửi info giữ nguyên
-        loggedInUsers.removeIf(user -> user.username != null && user.username.equals(u));
         isLoggedIn = true; username = u; loggedInUsers.add(this);
         out.println("login done#" + username + "#" + chips);
         if (!table1.isStarted && table1.players.size() < 5) {
