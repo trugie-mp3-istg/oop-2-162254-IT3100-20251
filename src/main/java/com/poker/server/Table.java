@@ -34,15 +34,15 @@ public class Table {
 
         for(int i=0; i<players.size(); i++){
             inGamePlayers.add(players.get(i));
-            players.get(i).isAllIn = false; //Resetting allin status
+            players.get(i).isAllIn = false; 
+            players.get(i).isFolded = false; // Reset folded status
+            players.get(i).selfBet = 0;      // Reset bet
         }
 
 
         for(int i = 0; i< inGamePlayers.size(); i++){
 
             Server player = inGamePlayers.get(i);
-
-            player.isFolded = false;
 
             player.hand = new Hand(deck);
             player.out.println("card#" +  player.hand.cards[0].toString() +
@@ -66,10 +66,21 @@ public class Table {
 
         currentBet = 10;
 
-        inGamePlayers.get(0).decreaseChips(currentBet);
-        inGamePlayers.get(0).selfBet = currentBet;
-        inGamePlayers.get(0).out.println("selfbet#" + String.valueOf(inGamePlayers.get(0).selfBet));
-        pot += currentBet;
+        // Big Blind logic (Assuming index 0 is BB for simplicity in this code)
+        if (inGamePlayers.size() > 0) {
+            Server bbPlayer = inGamePlayers.get(0);
+            if (bbPlayer.chips >= currentBet) {
+                bbPlayer.decreaseChips(currentBet);
+                bbPlayer.selfBet = currentBet;
+                bbPlayer.out.println("selfbet#" + String.valueOf(bbPlayer.selfBet));
+                pot += currentBet;
+            } else {
+                // Handle case where player can't afford BB (All-in Blind)
+                int allInAmt = bbPlayer.chips;
+                bbPlayer.handleAllIn(allInAmt); // This will update pot/chips
+            }
+        }
+        
         sendDataToAll("pot#"+ String.valueOf(pot));
         sendDataToAll("currentbet#" + String.valueOf(currentBet));
 
@@ -78,25 +89,27 @@ public class Table {
 
     public void changeTurn(){
 
-        // Check if all remaining players are all-in
+        // --- FIX LOGIC: Kiểm tra All-in và Tự động chạy bài ---
         int nonAllInCount = 0;
         for (Server p : inGamePlayers) {
             if (!p.isAllIn) nonAllInCount++;
         }
 
-        // If all players are all-in, immediately deal all remaining cards and go to showdown
-        if (nonAllInCount == 0) {
-            runOutAllCards();  // Deal flop, turn, river automatically
+        // Nếu (Chỉ còn 0 người có tiền) HOẶC (Còn 1 người có tiền NHƯNG tiền cược đã bằng nhau)
+        // => Không còn hành động nào có thể xảy ra nữa => SKIP đến Showdown
+        if (nonAllInCount == 0 || (nonAllInCount == 1 && isBettingEqual())) {
+            runOutAllCards(); 
             return;
         }
+        // -----------------------------------------------------
 
         if(whichPlayerTurn==inGamePlayers.size()-1){
             whichPlayerTurn = 0;
         }
-
         else whichPlayerTurn++;
 
-        // Skip all-in players in turn order
+        // Skip all-in players (Loop until we find a player who is NOT All-in)
+        // Safety check: count ensures we don't loop forever if everyone is all-in (handled above)
         while (inGamePlayers.get(whichPlayerTurn).isAllIn) {
             if(whichPlayerTurn==inGamePlayers.size()-1){
                 whichPlayerTurn = 0;
@@ -109,51 +122,63 @@ public class Table {
         sendDataToAll("whichPturn#"+ inGamePlayers.get(whichPlayerTurn).username);
 
     }
+    
+    // --- HELPER METHOD: Kiểm tra xem mọi người đã cược bằng nhau chưa ---
+    private boolean isBettingEqual() {
+        for (Server p : inGamePlayers) {
+            // Nếu có người chưa All-in mà cược ít hơn mức hiện tại -> Chưa cân bằng
+            if (!p.isAllIn && p.selfBet < currentBet) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-    /**
-     * When all players are all-in, automatically deal remaining community cards
-     * and proceed to showdown
-     */
     private void runOutAllCards() {
         sendDataToAll("removeaction");
 
-        // Deal remaining cards: flop (round 2), turn (round 3), river (round 4)
-        // Only deal cards for rounds we haven't reached yet
-
-        // If we're before flop, deal flop
+        // Deal remaining cards automatically
         if (round < 2) {
             round = 2;
             communityCards.flop(deck);
-            initiateNewRound();
             sendDataToAll("flop#" + communityCards.cards[0].toString() + "#" +
                     communityCards.cards[1].toString() + "#" + communityCards.cards[2].toString());
             sendDataToAll("round#" + "flop round");
+            try { Thread.sleep(1000); } catch (Exception e){} // Delay effect
         }
 
-        // Deal turn (always needed if we're at flop)
         if (round < 3) {
             round = 3;
             communityCards.turn(deck);
-            initiateNewRound();
             sendDataToAll("turn#" + communityCards.cards[3].toString());
             sendDataToAll("round#" + "turn round");
+            try { Thread.sleep(1000); } catch (Exception e){}
         }
 
-        // Deal river (final card)
         if (round < 4) {
             round = 4;
             communityCards.river(deck);
-            initiateNewRound();
             sendDataToAll("river#" + communityCards.cards[4].toString());
             sendDataToAll("round#" + "river round");
+            try { Thread.sleep(1000); } catch (Exception e){}
         }
 
-        // Now all cards are dealt, proceed to showdown
         compareAndReset();
     }
 
 
     public void changeRound(){
+        
+        // --- FIX LOGIC: Nếu vào vòng mới mà mọi người đã All-in hết rồi -> Run luôn
+        int nonAllInCount = 0;
+        for (Server p : inGamePlayers) {
+            if (!p.isAllIn) nonAllInCount++;
+        }
+        if (nonAllInCount <= 1) {
+            runOutAllCards();
+            return;
+        }
+        // -------------------------------------------------------------------
 
         sendDataToAll("removeaction");
 
@@ -163,9 +188,7 @@ public class Table {
 
         if(round==2){                        //flop
             communityCards.flop(deck);
-
             initiateNewRound();
-
             sendDataToAll("flop#" + communityCards.cards[0].toString() + "#" +
                     communityCards.cards[1].toString() + "#" + communityCards.cards[2].toString()
             );
@@ -174,18 +197,14 @@ public class Table {
 
         if(round==3){                        //turn
             communityCards.turn(deck);
-
             initiateNewRound();
-
             sendDataToAll("turn#" + communityCards.cards[3].toString());
             sendDataToAll("round#" + "turn round");
         }
 
         if(round==4){                       //river
             communityCards.river(deck);
-
             initiateNewRound();
-
             sendDataToAll("river#" + communityCards.cards[4].toString());
             sendDataToAll("round#" + "river round");
         }
@@ -236,18 +255,20 @@ public class Table {
                     + inGamePlayers.get(j).hand.cards[1].toString());
         }
 
-        // Distribute side pots if any all-in players exist
-        java.util.Map<Server, Integer> winnings = new java.util.HashMap<>();
-        boolean hasAllInPlayer = false;
-        for (Server p : inGamePlayers) {
-            if (p.isAllIn) {
-                hasAllInPlayer = true;
-                break;
-            }
-        }
+        // --- FIX LOGIC: CỘNG TIỀN CHO NGƯỜI THẮNG ---
+        // 1. Cộng tiền
+        temp.chips += pot; 
+        
+        // 2. Thông báo thắng
+        sendDataToAll("winner#Winner: " + temp.username);
 
+        // 3. Cập nhật tiền mới về Client
+        sendDataToAll("chips#" + temp.username + "#" + temp.chips);
 
-        sendDataToAll("pot#" + String.valueOf(pot));
+        // 4. Reset Pot
+        pot = 0;
+        sendDataToAll("pot#0");
+        // --------------------------------------------
 
         /*wait in the interval**/
         for (Server player : players) {
@@ -255,16 +276,23 @@ public class Table {
         }
 
         /* getting new player from waiting room**/
-
         while (true) {
             getNewPlayers();
 
-            if(players.size()>1){
+            if(players.size() > 1){ // Đổi điều kiện thành > 1 để chắc chắn có đối thủ
                 sendDataToAll("cardReset");
                 startGame();
                 break;
             }
-            else continue;
+            else {
+                // Nếu chỉ còn 1 người, gửi thông báo chờ
+                if(players.size() == 1) {
+                     players.get(0).out.println("message#Waiting for more players...");
+                }
+                // Chờ một chút rồi kiểm tra lại để tránh vòng lặp quá nhanh
+                try { Thread.sleep(1000); } catch(Exception e){}
+                continue;
+            }
         }
 
     }
@@ -307,18 +335,18 @@ public class Table {
 
 
         /* getting new player from waiting room**/
-
         while (true) {
             getNewPlayers();
 
-            if(players.size()>1){
+            if(players.size() > 1){
                 sendDataToAll("cardReset");
                 startGame();
                 break;
             }
-            else continue;
+             else {
+                try { Thread.sleep(1000); } catch(Exception e){}
+                continue;
+            }
         }
     }
 }
-
-
