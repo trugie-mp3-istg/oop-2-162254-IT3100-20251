@@ -255,11 +255,39 @@ public class Client{
                 }
 
                 if(message[2].equals("Fold")){
-//                    for(int i=0; i<players.size(); i++){
-//                        if(players.get(i).username.equals(message[1])){
-//                            players.remove(i);
-//                        }
-//                    }
+                    double dimOpacity = 0.5; // Độ mờ (0.0 là tàng hình, 1.0 là rõ nhất)
+
+                    if (tc.p2.getText().equals(message[1])) {
+                        tc.avatar2.setOpacity(dimOpacity);
+                        tc.p2.setOpacity(dimOpacity);
+                        tc.card21.setOpacity(dimOpacity); // Làm mờ cả bài úp (nếu muốn)
+                        tc.card22.setOpacity(dimOpacity);
+                    }
+                    else if (tc.p3.getText().equals(message[1])) {
+                        tc.avatar3.setOpacity(dimOpacity);
+                        tc.p3.setOpacity(dimOpacity);
+                        tc.card31.setOpacity(dimOpacity);
+                        tc.card32.setOpacity(dimOpacity);
+                    }
+                    else if (tc.p4.getText().equals(message[1])) {
+                        tc.avatar4.setOpacity(dimOpacity);
+                        tc.p4.setOpacity(dimOpacity);
+                        tc.card41.setOpacity(dimOpacity);
+                        tc.card42.setOpacity(dimOpacity);
+                    }
+                    else if (tc.p5.getText().equals(message[1])) {
+                        tc.avatar5.setOpacity(dimOpacity);
+                        tc.p5.setOpacity(dimOpacity);
+                        tc.card51.setOpacity(dimOpacity);
+                        tc.card52.setOpacity(dimOpacity);
+                    }
+                    // Nếu chính mình Fold (trường hợp hiếm nếu server gửi về cho cả mình)
+                    else if (username.equals(message[1])) {
+                        tc.avatar1.setOpacity(dimOpacity);
+                        tc.p1.setOpacity(dimOpacity);
+                        tc.card1.setOpacity(dimOpacity);
+                        tc.card2.setOpacity(dimOpacity);
+                    }
                 }
                 break;
                 
@@ -288,6 +316,20 @@ public class Client{
                 tc.card42.setImage(new Image("/graphic/download.jpg"));
                 tc.card51.setImage(new Image("/graphic/download.jpg"));
                 tc.card52.setImage(new Image("/graphic/download.jpg"));
+                tc.avatar1.setOpacity(1.0); tc.p1.setOpacity(1.0);
+                tc.card1.setOpacity(1.0);   tc.card2.setOpacity(1.0);
+
+                tc.avatar2.setOpacity(1.0); tc.p2.setOpacity(1.0);
+                tc.card21.setOpacity(1.0);  tc.card22.setOpacity(1.0);
+
+                tc.avatar3.setOpacity(1.0); tc.p3.setOpacity(1.0);
+                tc.card31.setOpacity(1.0);  tc.card32.setOpacity(1.0);
+
+                tc.avatar4.setOpacity(1.0); tc.p4.setOpacity(1.0);
+                tc.card41.setOpacity(1.0);  tc.card42.setOpacity(1.0);
+
+                tc.avatar5.setOpacity(1.0); tc.p5.setOpacity(1.0);
+                tc.card51.setOpacity(1.0);  tc.card52.setOpacity(1.0);
                 tc.action.setText(" ");
 
                 players = new ArrayList<>();

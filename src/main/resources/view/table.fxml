@@ -185,7 +185,7 @@
       <Circle fx:id="pot4" fill="#1d9a38" layoutX="672.0" layoutY="275.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
       <Circle fx:id="pot5" fill="#1d9a38" layoutX="640.0" layoutY="292.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
       <Circle fx:id="pot6" fill="#1d9a38" layoutX="577.0" layoutY="292.0" radius="16.0" stroke="BLACK" strokeType="INSIDE" />
-      <Circle fx:id="avatar2" fill="#998b8b" layoutX="100.0" layoutY="320.0" opacity="0.64" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
+      <Circle fx:id="avatar2" fill="#998b8b" layoutX="100.0" layoutY="320.0" opacity="1.0" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
       <TextField fx:id="p2" alignment="CENTER" layoutX="55.0" layoutY="380.0" prefHeight="42.0" prefWidth="90.0" style="-fx-background-color: #998B8B; -fx-text-fill: white;" text="Empty">
       </TextField>
       <TextField fx:id="c2" alignment="CENTER" layoutX="55.0" layoutY="425.0" prefHeight="38.0" prefWidth="90.0" style="-fx-background-color: #eeeeee;" text="-">
@@ -195,7 +195,7 @@
       </TextField>
       <TextField fx:id="c1" alignment="CENTER" layoutX="680.0" layoutY="720.0" prefHeight="38.0" prefWidth="90.0" style="-fx-background-color: #eeeeee;" text="-">
       </TextField>
-      <Circle fx:id="avatar3" fill="#998b8b" layoutX="270.0" layoutY="120.0" opacity="0.64" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
+      <Circle fx:id="avatar3" fill="#998b8b" layoutX="270.0" layoutY="120.0" opacity="1.0" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
       <TextField fx:id="p3" alignment="CENTER" layoutX="330.0" layoutY="70.0" prefHeight="42.0" prefWidth="90.0" style="-fx-background-color: #998B8B; -fx-text-fill: white;" text="Empty">
       </TextField>
       <TextField fx:id="c5" alignment="CENTER" layoutX="1055.0" layoutY="425.0" prefHeight="38.0" prefWidth="90.0" style="-fx-background-color: #eeeeee;" text="-">
@@ -204,8 +204,8 @@
       </TextField>
       <TextField fx:id="c3" alignment="CENTER" layoutX="330.0" layoutY="115.0" prefHeight="38.0" prefWidth="90.0" style="-fx-background-color: #eeeeee;" text="-">
       </TextField>
-      <Circle fx:id="avatar5" fill="#998b8b" layoutX="1100.0" layoutY="320.0" opacity="0.64" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
-      <Circle fx:id="avatar4" fill="#998b8b" layoutX="930.0" layoutY="120.0" opacity="0.64" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
+      <Circle fx:id="avatar5" fill="#998b8b" layoutX="1100.0" layoutY="320.0" opacity="1.0" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
+      <Circle fx:id="avatar4" fill="#998b8b" layoutX="930.0" layoutY="120.0" opacity="1.0" radius="54.0" stroke="#9e8f8d" strokeType="INSIDE" />
       <TextField fx:id="p5" alignment="CENTER" layoutX="1055.0" layoutY="380.0" prefHeight="42.0" prefWidth="90.0" style="-fx-background-color: #998B8B; -fx-text-fill: #ffffff;" text="Empty">
       </TextField>
       <TextField fx:id="p4" alignment="CENTER" layoutX="780.0" layoutY="70.0" prefHeight="42.0" prefWidth="90.0" style="-fx-background-color: #998B8B; -fx-text-fill: #ffffff;" text="Empty">
