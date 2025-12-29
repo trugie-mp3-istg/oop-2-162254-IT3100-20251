@@ -158,6 +158,28 @@ public class TableController{
         }
     }
 
+    /**
+     * Handles All-In action: player bets all remaining chips
+     */
+    public void allIn(){
+
+        message.setText(" ");
+
+        if(Main.client.isTurn){
+            if(Main.client.chips > 0){
+                Main.client.out.println("allin");
+                Main.client.isTurn = false;
+            }
+            else {
+                message.setText("You have no chips to go all-in!");
+            }
+        }
+        else {
+            message.setText("Not Your Turn!");
+        }
+    }
+
+
     public void logout(){
 
         if(Main.client.canLogout){

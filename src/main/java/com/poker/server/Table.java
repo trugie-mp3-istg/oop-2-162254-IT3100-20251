@@ -1,11 +1,11 @@
 package com.poker.server;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.poker.model.CommunityCards;
 import com.poker.model.Deck;
 import com.poker.model.Hand;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Table {
 
@@ -19,10 +19,12 @@ public class Table {
     public int currentBet;
     public int checkNumber;
     public boolean isStarted;
+    public PotManager potManager;
 
     Table(){
         players = new ArrayList<>();
         isStarted = false;
+        potManager = null;
     }
 
     public void startGame() {
@@ -31,9 +33,11 @@ public class Table {
         communityCards = new CommunityCards();
         currentBet = 0;
         pot = 0;
+        potManager = new PotManager(players);
 
         for(int i=0; i<players.size(); i++){
             inGamePlayers.add(players.get(i));
+            players.get(i).isAllIn = false; //Resetting allin status
         }
 
 
@@ -77,15 +81,78 @@ public class Table {
 
     public void changeTurn(){
 
+        // Check if all remaining players are all-in
+        int nonAllInCount = 0;
+        for (Server p : inGamePlayers) {
+            if (!p.isAllIn) nonAllInCount++;
+        }
+
+        // If all players are all-in, immediately deal all remaining cards and go to showdown
+        if (nonAllInCount == 0) {
+            runOutAllCards();  // Deal flop, turn, river automatically
+            return;
+        }
+
         if(whichPlayerTurn==inGamePlayers.size()-1){
             whichPlayerTurn = 0;
         }
 
         else whichPlayerTurn++;
 
+        // Skip all-in players in turn order
+        while (inGamePlayers.get(whichPlayerTurn).isAllIn) {
+            if(whichPlayerTurn==inGamePlayers.size()-1){
+                whichPlayerTurn = 0;
+            } else {
+                whichPlayerTurn++;
+            }
+        }
+
         inGamePlayers.get(whichPlayerTurn).isTurn = true;
         sendDataToAll("whichPturn#"+ inGamePlayers.get(whichPlayerTurn).username);
 
+    }
+
+    /**
+     * When all players are all-in, automatically deal remaining community cards
+     * and proceed to showdown
+     */
+    private void runOutAllCards() {
+        sendDataToAll("removeaction");
+
+        // Deal remaining cards: flop (round 2), turn (round 3), river (round 4)
+        // Only deal cards for rounds we haven't reached yet
+
+        // If we're before flop, deal flop
+        if (round < 2) {
+            round = 2;
+            communityCards.flop(deck);
+            initiateNewRound();
+            sendDataToAll("flop#" + communityCards.cards[0].toString() + "#" +
+                    communityCards.cards[1].toString() + "#" + communityCards.cards[2].toString());
+            sendDataToAll("round#" + "flop round");
+        }
+
+        // Deal turn (always needed if we're at flop)
+        if (round < 3) {
+            round = 3;
+            communityCards.turn(deck);
+            initiateNewRound();
+            sendDataToAll("turn#" + communityCards.cards[3].toString());
+            sendDataToAll("round#" + "turn round");
+        }
+
+        // Deal river (final card)
+        if (round < 4) {
+            round = 4;
+            communityCards.river(deck);
+            initiateNewRound();
+            sendDataToAll("river#" + communityCards.cards[4].toString());
+            sendDataToAll("round#" + "river round");
+        }
+
+        // Now all cards are dealt, proceed to showdown
+        compareAndReset();
     }
 
 
@@ -172,12 +239,42 @@ public class Table {
                     + inGamePlayers.get(j).hand.cards[1].toString());
         }
 
-        sendDataToAll("winner#" + "\" " + temp.username + " Won with a " + temp.hand.display() + "!\"");
-        temp.chips += pot;
-        pot = 0;
+        // Distribute side pots if any all-in players exist
+        java.util.Map<Server, Integer> winnings = new java.util.HashMap<>();
+        boolean hasAllInPlayer = false;
+        for (Server p : inGamePlayers) {
+            if (p.isAllIn) {
+                hasAllInPlayer = true;
+                break;
+            }
+        }
+
+        if (hasAllInPlayer && potManager != null) {
+            // Distribute using side pots
+            List<Server> winners = new ArrayList<>();
+            winners.add(temp);
+            winnings = potManager.distributeWinnings(winners);
+
+            int totalWinnings = 0;
+            for (int w : winnings.values()) {
+                totalWinnings += w;
+            }
+
+            sendDataToAll("winner#" + "\" " + temp.username + " Won with a " + temp.hand.display() + "!\"");
+            for (Server w : winnings.keySet()) {
+                w.chips += winnings.get(w);
+                sendDataToAll("chips#" + w.username + "#" + String.valueOf(w.chips));
+            }
+            pot = 0;
+        } else {
+            // Standard single pot distribution
+            sendDataToAll("winner#" + "\" " + temp.username + " Won with a " + temp.hand.display() + "!\"");
+            temp.chips += pot;
+            pot = 0;
+            sendDataToAll("chips#" + temp.username + "#" + String.valueOf(temp.chips));
+        }
 
         sendDataToAll("pot#" + String.valueOf(pot));
-        sendDataToAll("chips#" + temp.username + "#" + String.valueOf(temp.chips));
 
         /*wait in the interval**/
         for (Server player : players) {
@@ -250,8 +347,30 @@ public class Table {
         }
     }
 
+      /**
+     * Handles all-in situation: creates side pots when a player goes all-in.
+     * @param player The player going all-in
+     * @param betAmount The total bet amount (including previous bets in round)
+     */
+    public void handleAllIn(Server player, int betAmount) {
+        if (potManager != null) {
+            potManager.handleAllIn(player, betAmount);
+            // Update pot display
+            pot = getTotalPot();
+        }
+    }
+
+    /**
+     * Gets the total pot amount from pot manager.
+     * @return Total amount in all pots
+     */
+    public int getTotalPot() {
+        if (potManager != null) {
+            return potManager.getTotalPot();
+        }
+        return pot;
+    }
+
 }
-
-
 
 
