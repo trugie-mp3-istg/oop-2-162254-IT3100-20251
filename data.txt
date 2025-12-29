@@ -1,2 +1,3 @@
-alex#1#10990
-james#2#9010
+admin#123#10000
+player1#pass#10000
+player2#pass#10000

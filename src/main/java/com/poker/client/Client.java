@@ -1,19 +1,23 @@
 package com.poker.client;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.*;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class Client{
@@ -100,36 +104,61 @@ public class Client{
                 break;
 
             case "opponentAdded":
-                players.add(new BasePlayer(message[1],Integer.parseInt(message[2])));
-
-                if(players.size()==2) {
-
-                    tc.p2.setText(message[1]);
-                    tc.c2.setText(String.valueOf(message[2]));
-                    tc.circle2.setVisible(true);
-                    tc.circle2.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
-                    tc.avatar2.setFill(new ImagePattern(new Image("/graphic/face3.jpg")));
+                String opponentName = message[1];
+                int opponentChips = Integer.parseInt(message[2]);
+                
+                // ← KIỂM TRA: Opponent này đã có trong danh sách chưa?
+                boolean alreadyExists = false;
+                for(Player p : players) {
+                    if(p.username.equals(opponentName)) {
+                        alreadyExists = true;
+                        System.out.println("[Client] Opponent " + opponentName + " already in list. Skip!");
+                        break;
+                    }
                 }
-                else if(players.size()==3){
-                    tc.p3.setText(message[1]);
-                    tc.c3.setText(String.valueOf(message[2]));
-                    tc.circle3.setVisible(true);
-                    tc.circle3.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
-                    tc.avatar3.setFill(new ImagePattern(new Image("/graphic/face5.png")));
-                }
-                else if(players.size()==4){
-                    tc.p4.setText(message[1]);
-                    tc.c4.setText(String.valueOf(message[2]));
-                    tc.circle4.setVisible(true);
-                    tc.circle4.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
-                    tc.avatar4.setFill(new ImagePattern(new Image("/graphic/face4.jpg")));
-                }
-                else if(players.size()==5){
-                    tc.p5.setText(message[1]);
-                    tc.c5.setText(String.valueOf(message[2]));
-                    tc.circle5.setVisible(true);
-                    tc.circle5.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
-                    tc.avatar5.setFill(new ImagePattern(new Image("/graphic/face6.png")));
+                
+                // ← NẾU chưa có: Thêm vào
+                if(!alreadyExists) {
+                    players.add(new BasePlayer(opponentName, opponentChips));
+                    System.out.println("[Client] Added opponent: " + opponentName + " (Total: " + players.size() + ")");
+                    
+                    // ← HIỂN THỊ dựa trên số lượng opponent
+                    // players.size() = 1 (chỉ mình) → không hiển thị gì
+                    // players.size() = 2 (mình + 1 người) → hiển thị position 2
+                    // players.size() = 3 (mình + 2 người) → hiển thị position 3
+                    
+                    if(players.size() == 2) {
+                        tc.p2.setText(opponentName);
+                        tc.c2.setText(String.valueOf(opponentChips));
+                        tc.circle2.setVisible(true);
+                        tc.circle2.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
+                        tc.avatar2.setFill(new ImagePattern(new Image("/graphic/face3.jpg")));
+                        System.out.println("[Display] Showing opponent at position 2: " + opponentName);
+                    }
+                    else if(players.size() == 3) {
+                        tc.p3.setText(opponentName);
+                        tc.c3.setText(String.valueOf(opponentChips));
+                        tc.circle3.setVisible(true);
+                        tc.circle3.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
+                        tc.avatar3.setFill(new ImagePattern(new Image("/graphic/face5.png")));
+                        System.out.println("[Display] Showing opponent at position 3: " + opponentName);
+                    }
+                    else if(players.size() == 4) {
+                        tc.p4.setText(opponentName);
+                        tc.c4.setText(String.valueOf(opponentChips));
+                        tc.circle4.setVisible(true);
+                        tc.circle4.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
+                        tc.avatar4.setFill(new ImagePattern(new Image("/graphic/face4.jpg")));
+                        System.out.println("[Display] Showing opponent at position 4: " + opponentName);
+                    }
+                    else if(players.size() == 5) {
+                        tc.p5.setText(opponentName);
+                        tc.c5.setText(String.valueOf(opponentChips));
+                        tc.circle5.setVisible(true);
+                        tc.circle5.setFill(new ImagePattern(new Image("/graphic/blackChip2.jpg")));
+                        tc.avatar5.setFill(new ImagePattern(new Image("/graphic/face6.png")));
+                        System.out.println("[Display] Showing opponent at position 5: " + opponentName);
+                    }
                 }
                 break;
 
@@ -142,7 +171,7 @@ public class Client{
             case "chips":
                 for(int i=0; i<players.size(); i++){
 
-                    if(message[1].equals(players.get(i).getUsername())){
+                    if(message[1].equals(players.get(i).username)){
 
                         if(i==0){
                             tc.c1.setText(message[2]);
@@ -186,7 +215,7 @@ public class Client{
 
             case "whichPturn":
                 for(Player player: players){
-                    if(message[1].equals(player.getUsername())){
+                    if(message[1].equals(player.username)){
                         if(message[1].equals(username)){
                             isTurn = true;
                         }
@@ -197,6 +226,7 @@ public class Client{
 
             case "winner":
                 tc.action.setText(message[1]);
+                AudioManager.playRoundEndSound();
                 break;
 
             case "round":
@@ -225,12 +255,47 @@ public class Client{
                 }
 
                 if(message[2].equals("Fold")){
-//                    for(int i=0; i<players.size(); i++){
-//                        if(players.get(i).username.equals(message[1])){
-//                            players.remove(i);
-//                        }
-//                    }
+                    double dimOpacity = 0.5; // Độ mờ (0.0 là tàng hình, 1.0 là rõ nhất)
+
+                    if (tc.p2.getText().equals(message[1])) {
+                        tc.avatar2.setOpacity(dimOpacity);
+                        tc.p2.setOpacity(dimOpacity);
+                        tc.card21.setOpacity(dimOpacity); // Làm mờ cả bài úp (nếu muốn)
+                        tc.card22.setOpacity(dimOpacity);
+                    }
+                    else if (tc.p3.getText().equals(message[1])) {
+                        tc.avatar3.setOpacity(dimOpacity);
+                        tc.p3.setOpacity(dimOpacity);
+                        tc.card31.setOpacity(dimOpacity);
+                        tc.card32.setOpacity(dimOpacity);
+                    }
+                    else if (tc.p4.getText().equals(message[1])) {
+                        tc.avatar4.setOpacity(dimOpacity);
+                        tc.p4.setOpacity(dimOpacity);
+                        tc.card41.setOpacity(dimOpacity);
+                        tc.card42.setOpacity(dimOpacity);
+                    }
+                    else if (tc.p5.getText().equals(message[1])) {
+                        tc.avatar5.setOpacity(dimOpacity);
+                        tc.p5.setOpacity(dimOpacity);
+                        tc.card51.setOpacity(dimOpacity);
+                        tc.card52.setOpacity(dimOpacity);
+                    }
+                    // Nếu chính mình Fold (trường hợp hiếm nếu server gửi về cho cả mình)
+                    else if (username.equals(message[1])) {
+                        tc.avatar1.setOpacity(dimOpacity);
+                        tc.p1.setOpacity(dimOpacity);
+                        tc.card1.setOpacity(dimOpacity);
+                        tc.card2.setOpacity(dimOpacity);
+                    }
                 }
+                break;
+                
+            case "sidepots":
+                // Optional: Display side pots breakdown
+                // Format: "sidepots#100,200,50"
+                System.out.println("Side pots: " + message[1]);
+                // Future: Display pot breakdown in UI
                 break;
 
             case "cardReset":
@@ -251,6 +316,20 @@ public class Client{
                 tc.card42.setImage(new Image("/graphic/download.jpg"));
                 tc.card51.setImage(new Image("/graphic/download.jpg"));
                 tc.card52.setImage(new Image("/graphic/download.jpg"));
+                tc.avatar1.setOpacity(1.0); tc.p1.setOpacity(1.0);
+                tc.card1.setOpacity(1.0);   tc.card2.setOpacity(1.0);
+
+                tc.avatar2.setOpacity(1.0); tc.p2.setOpacity(1.0);
+                tc.card21.setOpacity(1.0);  tc.card22.setOpacity(1.0);
+
+                tc.avatar3.setOpacity(1.0); tc.p3.setOpacity(1.0);
+                tc.card31.setOpacity(1.0);  tc.card32.setOpacity(1.0);
+
+                tc.avatar4.setOpacity(1.0); tc.p4.setOpacity(1.0);
+                tc.card41.setOpacity(1.0);  tc.card42.setOpacity(1.0);
+
+                tc.avatar5.setOpacity(1.0); tc.p5.setOpacity(1.0);
+                tc.card51.setOpacity(1.0);  tc.card52.setOpacity(1.0);
                 tc.action.setText(" ");
 
                 players = new ArrayList<>();
@@ -291,7 +370,7 @@ public class Client{
 
             case "logout":
                 for(int i=0; i<players.size(); i++){
-                    if(players.get(i).getUsername().equals(message[1])){
+                    if(players.get(i).username.equals(message[1])){
                         players.remove(i);
                         break;
                     }
@@ -333,6 +412,21 @@ public class Client{
             case "alive":
                 canLogout=true;
                 break;
+            
+            case "message": // Thêm case
+                tc.message.setText(message[1]);
+                break;
+            
+            case "isleader":
+                boolean isLeader = message[1].equals("true");
+                tc.setTableLeader(isLeader);
+
+                if(isLeader) {
+                    System.out.println("[Client] You are the TABLE LEADER!");
+                } else {
+                    System.out.println("[Client] You are NOT the leader");
+                }
+                break;
         }
     }
 
@@ -347,7 +441,7 @@ public class Client{
 
             Main.stage.close();
             Main.stage.setTitle("WAITING ROOM");
-            Main.stage.setScene(new Scene(root));
+            Main.stage.setScene(new Scene(root, 600, 400));
             Main.stage.show();
         }
         catch (IOException e){
