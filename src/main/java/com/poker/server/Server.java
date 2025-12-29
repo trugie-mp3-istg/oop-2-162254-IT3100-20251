@@ -254,7 +254,7 @@ public class Server implements Runnable{
                         lastPlayer.out.println("message# Chỉ còn bạn (Leader). Chờ người chơi khác vào...");
                         lastPlayer.out.println("message# Startgame sẽ sáng lại khi có người mới vào bàn");
                         
-                        // ✅ QUAN TRỌNG: KHÔNG RESET → người mới vào sẽ join vào bàn này
+                        // QUAN TRỌNG: KHÔNG RESET → người mới vào sẽ join vào bàn này
                         System.out.println("[No reset] Waiting for new players to join Table " + getTableNumber(affectedTable));
                     }
                 }
