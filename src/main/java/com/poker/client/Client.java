@@ -89,7 +89,7 @@ public class Client{
                 chips = Integer.parseInt(message[2]);
 
                 players = new ArrayList<>();
-                players.add(new Player(username,chips));
+                players.add(new BasePlayer(username,chips));
 
                 openTable();
                 tc.message.setText("Waiting for players...");
@@ -119,7 +119,7 @@ public class Client{
                 
                 // ← NẾU chưa có: Thêm vào
                 if(!alreadyExists) {
-                    players.add(new Player(opponentName, opponentChips));
+                    players.add(new BasePlayer(opponentName, opponentChips));
                     System.out.println("[Client] Added opponent: " + opponentName + " (Total: " + players.size() + ")");
                     
                     // ← HIỂN THỊ dựa trên số lượng opponent
@@ -333,7 +333,7 @@ public class Client{
                 tc.action.setText(" ");
 
                 players = new ArrayList<>();
-                players.add(new Player(username,chips));
+                players.add(new BasePlayer(username,chips));
                 break;
 
             case "cardshow":

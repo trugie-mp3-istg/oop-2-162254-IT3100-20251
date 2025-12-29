@@ -178,6 +178,8 @@ public class Server implements Runnable{
         waitingUsers.remove(this);
     }
 
+
+
     private void parseData(String data) {
 
         String [] message = data.split("#");
