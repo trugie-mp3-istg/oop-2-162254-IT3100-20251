@@ -19,12 +19,10 @@ public class Table {
     public int currentBet;
     public int checkNumber;
     public boolean isStarted;
-    public PotManager potManager;
 
     Table(){
         players = new ArrayList<>();
         isStarted = false;
-        potManager = null;
     }
 
     public void startGame() {
@@ -33,7 +31,6 @@ public class Table {
         communityCards = new CommunityCards();
         currentBet = 0;
         pot = 0;
-        potManager = new PotManager(players);
 
         for(int i=0; i<players.size(); i++){
             inGamePlayers.add(players.get(i));
@@ -249,30 +246,6 @@ public class Table {
             }
         }
 
-        if (hasAllInPlayer && potManager != null) {
-            // Distribute using side pots
-            List<Server> winners = new ArrayList<>();
-            winners.add(temp);
-            winnings = potManager.distributeWinnings(winners);
-
-            int totalWinnings = 0;
-            for (int w : winnings.values()) {
-                totalWinnings += w;
-            }
-
-            sendDataToAll("winner#" + "\" " + temp.username + " Won with a " + temp.hand.display() + "!\"");
-            for (Server w : winnings.keySet()) {
-                w.chips += winnings.get(w);
-                sendDataToAll("chips#" + w.username + "#" + String.valueOf(w.chips));
-            }
-            pot = 0;
-        } else {
-            // Standard single pot distribution
-            sendDataToAll("winner#" + "\" " + temp.username + " Won with a " + temp.hand.display() + "!\"");
-            temp.chips += pot;
-            pot = 0;
-            sendDataToAll("chips#" + temp.username + "#" + String.valueOf(temp.chips));
-        }
 
         sendDataToAll("pot#" + String.valueOf(pot));
 
@@ -346,31 +319,6 @@ public class Table {
             else continue;
         }
     }
-
-      /**
-     * Handles all-in situation: creates side pots when a player goes all-in.
-     * @param player The player going all-in
-     * @param betAmount The total bet amount (including previous bets in round)
-     */
-    public void handleAllIn(Server player, int betAmount) {
-        if (potManager != null) {
-            potManager.handleAllIn(player, betAmount);
-            // Update pot display
-            pot = getTotalPot();
-        }
-    }
-
-    /**
-     * Gets the total pot amount from pot manager.
-     * @return Total amount in all pots
-     */
-    public int getTotalPot() {
-        if (potManager != null) {
-            return potManager.getTotalPot();
-        }
-        return pot;
-    }
-
 }
 
 
