@@ -216,13 +216,22 @@
          <font>
             <Font size="20.0" />
          </font></Text>
-      <Text fx:id="action3" fill="WHITE" layoutX="329.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="116.0">
+      <Text fx:id="action3" fill="WHITE" layoutX="318.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="124.0">
+         <font>
+            <Font name="Lucida Fax Demibold" size="19.0" />
+         </font>
       </Text>
-      <Text fx:id="action2" fill="WHITE" layoutX="100.0" layoutY="487.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="75.0">
+      <Text fx:id="action2" fill="WHITE" layoutX="39.0" layoutY="486.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="124.0">
+         <font>
+            <Font name="Lucida Fax Demibold" size="19.0" />
+         </font>
       </Text>
-      <Text fx:id="action4" fill="WHITE" layoutX="961.0" layoutY="104.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="124.0">
+      <Text fx:id="action4" fill="WHITE" layoutX="763.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="124.0">
+         <font>
+            <Font name="Lucida Fax Demibold" size="19.0" />
+         </font>
       </Text>
-      <Text fx:id="action5" fill="WHITE" layoutX="1069.0" layoutY="486.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="124.0">
+      <Text fx:id="action5" fill="WHITE" layoutX="1038.0" layoutY="486.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="124.0">
          <font>
             <Font name="Lucida Fax Demibold" size="19.0" />
          </font>

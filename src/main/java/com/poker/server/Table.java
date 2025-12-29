@@ -260,7 +260,7 @@ public class Table {
         temp.chips += pot; 
         
         // 2. Thông báo thắng
-        sendDataToAll("winner#Winner: " + temp.username);
+        sendDataToAll("winner#Winner: " + temp.username + " Won with a " + temp.hand.display()+"!");
 
         // 3. Cập nhật tiền mới về Client
         sendDataToAll("chips#" + temp.username + "#" + temp.chips);
