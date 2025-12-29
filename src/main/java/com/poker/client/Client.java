@@ -38,7 +38,7 @@ public class Client{
     private SignupController sc;
     private TableController tc;
     private WaitController wc;
-    public List<Player> players;
+    public List<BasePlayer> players;
 
     Client(){
         isLoggedIn = false;
@@ -117,7 +117,7 @@ public class Client{
                 
                 // ← KIỂM TRA: Opponent này đã có trong danh sách chưa?
                 boolean alreadyExists = false;
-                for(Player p : players) {
+                for(BasePlayer p : players) {
                     if(p.username.equals(opponentName)) {
                         alreadyExists = true;
                         System.out.println("[Client] Opponent " + opponentName + " already in list. Skip!");
@@ -222,7 +222,7 @@ public class Client{
                 break;
 
             case "whichPturn":
-                for(Player player: players){
+                for(BasePlayer player: players){
                     if(message[1].equals(player.username)){
                         if(message[1].equals(username)){
                             isTurn = true;
